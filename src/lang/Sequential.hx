@@ -1,0 +1,3 @@
+package lang;
+
+interface Sequential {}

@@ -1,0 +1,4 @@
+package lang;
+
+interface RandomAccess {
+}
