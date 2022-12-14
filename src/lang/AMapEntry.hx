@@ -4,7 +4,7 @@ import lang.exceptions.UnsupportedOperationException;
 import lang.exceptions.IndexOutOfBoundsException;
 
 abstract class AMapEntry extends APersistentVector implements IMapEntry {
-	override public function nth1(i:Int):Any {
+	public function nth1(i:Int):Any {
 		if (i == 0)
 			return key();
 		else if (i == 1)
@@ -27,11 +27,11 @@ abstract class AMapEntry extends APersistentVector implements IMapEntry {
 		return null;
 	}
 
-	override public function assocN(i:Int, val:Any):IPersistentVector {
+	public function assocN(i:Int, val:Any):IPersistentVector {
 		return asVector().assocN(i, val);
 	}
 
-	override public function count():Int {
+	public function count():Int {
 		return 2;
 	}
 
@@ -39,15 +39,15 @@ abstract class AMapEntry extends APersistentVector implements IMapEntry {
 		return asVector().seq();
 	}
 
-	override public function cons(o:Any):IPersistentVector {
-		return asVector().cons(o);
+	public function cons(o:Any):IPersistentVector {
+		return cast asVector().cons(o);
 	}
 
-	override public function empty():IPersistentCollection {
+	public function empty():IPersistentCollection {
 		return null;
 	}
 
-	override public function pop():IPersistentStack {
+	public function pop():IPersistentStack {
 		// return LazilyPersistentVector.createOwning(key());
 		return null;
 	}

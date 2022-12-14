@@ -96,30 +96,12 @@ class PersistentVector extends APersistentVector implements IObj implements IEdi
 		throw new IndexOutOfBoundsException();
 	}
 
-	override public function nth1(i:Int):Any {
+	public function nth1(i:Int):Any {
 		var node:Vector<Any> = arrayFor(i);
 		return node[i & 0x01f];
 	}
 
-	override public function nth2(i:Int, notFound:Any):Any {
-		if (i >= 0 && i < cnt)
-			return nth1(i);
-		return notFound;
-	}
-
-	override public function nth(...args:Any):Any {
-		switch (args.length) {
-			case 1:
-				return nth1(cast args[0]);
-			case 2:
-				return nth2(cast args[0], cast args[1]);
-			default:
-				throwArity(args.length);
-				return null;
-		}
-	}
-
-	override public function assocN(i:Int, val:Any):PersistentVector {
+	public function assocN(i:Int, val:Any):PersistentVector {
 		if (i >= 0 && i < cnt) {
 			if (i >= tailoff()) {
 				var newTail:Vector<Any> = new Vector<Any>(tail.length);
@@ -145,7 +127,7 @@ class PersistentVector extends APersistentVector implements IObj implements IEdi
 		return ret;
 	}
 
-	override public function count():Int {
+	public function count():Int {
 		return cnt;
 	}
 
@@ -160,7 +142,7 @@ class PersistentVector extends APersistentVector implements IObj implements IEdi
 		return new PersistentVector(cnt, shift, root, tail, meta);
 	}
 
-	override public function cons(val:Any):PersistentVector {
+	public function cons(val:Any):PersistentVector {
 		// room in tail?
 		//	if(tail.length < 32)
 		if (cnt - tailoff() < 32) {
@@ -300,6 +282,55 @@ class PersistentVector extends APersistentVector implements IObj implements IEdi
 			return null;
 		}
 	}
+
+	public function empty():IPersistentCollection {
+		return EMPTY.withMeta(meta());
+	}
+
+	public function pop():PersistentVector {
+		if (cnt == 0)
+			throw new IllegalStateException("Can't pop empty vector");
+		if (cnt == 1)
+			return EMPTY.withMeta(meta());
+		// if(tail.length > 1)
+		if (cnt - tailoff() > 1) {
+			var newTail:Vector<Any> = new Vector<Any>(tail.length - 1);
+			U.vectorCopy(tail, 0, newTail, 0, newTail.length);
+			return new PersistentVector(cnt - 1, shift, root, newTail, meta());
+		}
+		var newtail:Vector<Any> = arrayFor(cnt - 2);
+
+		var newroot:Node = popTail(shift, root);
+		var newshift:Int = shift;
+		if (newroot == null) {
+			newroot = EMPTY_NODE;
+		}
+		if (shift > 5 && newroot.array[1] == null) {
+			newroot = cast newroot.array[0];
+			newshift -= 5;
+		}
+		return new PersistentVector(cnt - 1, newshift, newroot, newtail, meta());
+	}
+
+	private function popTail(level:Int, node:Node):Node {
+		var subidx:Int = ((cnt - 2) >>> level) & 0x01f;
+		if (level > 5) {
+			var newchild:Node = popTail(level - 5, cast node.array[subidx]);
+			if (newchild == null && subidx == 0)
+				return null;
+			else {
+				var ret:Node = new Node(root.edit, node.array.copy());
+				ret.array[subidx] = newchild;
+				return ret;
+			}
+		} else if (subidx == 0)
+			return null;
+		else {
+			var ret:Node = new Node(root.edit, node.array.copy());
+			ret.array[subidx] = null;
+			return ret;
+		}
+	}
 }
 
 // ChunkedSeq ========================================================================
@@ -346,11 +377,11 @@ class ChunkedSeq extends ASeq implements IChunkedSeq implements Counted implemen
 		return new ChunkedSeq(vec, node, i, offset, meta);
 	}
 
-	override public function first():Any {
+	public function first():Any {
 		return node[offset];
 	}
 
-	override public function next():ISeq {
+	public function next():ISeq {
 		if (offset + 1 < node.length)
 			return new ChunkedSeq(vec, node, i, offset + 1);
 		return chunkedNext();

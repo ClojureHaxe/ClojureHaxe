@@ -2,7 +2,7 @@ package lang;
 
 import lang.exceptions.ArityException;
 
-class AFn implements IFn {
+abstract class AFn implements IFn {
 	public function call():Any {
 		return invoke();
 	}

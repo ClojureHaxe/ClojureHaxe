@@ -43,7 +43,8 @@ implements IHashEq {
 
 	public function hasheq():Int {
 		if (_hasheq == 0) {
-			_hasheq = Murmur3.hashOrdered(this);
+			// TODO: check if work
+			_hasheq = Murmur3.hashOrdered(cast this);
 		}
 		return _hasheq;
 	}
@@ -75,22 +76,4 @@ implements IHashEq {
 			return PersistentList.EMPTY;
 		return s;
 	}
-
-	
-	public function first():Any {
-		throw new Exception("ASeq.first() implemented in subclassed.");
-		return null;
-	}
-
-	public function next():ISeq {
-		throw new Exception("ASeq.next() implemented in subclasses.");
-		return null;
-	}
-
-	public function hasNext():Bool {
-		return next() != null;
-	}
-
-	
 }
-

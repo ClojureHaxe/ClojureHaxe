@@ -78,7 +78,7 @@ class Main {
 		trace(U.instanceof(pp2, IPersistentVector));
 		trace(RT.printString(pp2));
 
-		var pp3:IPersistentVector = PersistentVector.createFromItems(1,2,3);
+		var pp3:PersistentVector = PersistentVector.createFromItems(1,2,3);
 		pp3 = pp3.cons(pp3);
 		trace(pp3);
 

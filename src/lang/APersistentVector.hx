@@ -6,7 +6,7 @@ import lang.exceptions.UnsupportedOperationException;
 import lang.exceptions.NoSuchElementException;
 import lang.exceptions.IllegalArgumentException;
 
-class APersistentVector extends AFn implements IPersistentVector // implements Iterable
+abstract class APersistentVector extends AFn implements IPersistentVector // implements Iterable
 // implements List
 implements RandomAccess // implements Comparable
 // implements Serializable
@@ -79,6 +79,13 @@ implements IHashEq implements IEqual {
 		return doEquals(this, obj);
 	}
 
+	public function equiv(obj:Any):Bool {
+		if (obj == this)
+			return true;
+		// TODO: equiv
+		return equals(obj);
+	}
+
 	public function hasheq():Int {
 		var hash:Int = this._hasheq;
 		if (hash == 0) {
@@ -99,10 +106,6 @@ implements IHashEq implements IEqual {
 		return nth1(index);
 	}
 
-	public function nth1(i:Int):Any {
-		throw new UnsupportedOperationException("Must be implemented in subclasses.");
-	}
-
 	public function nth2(i:Int, notFound:Any):Any {
 		if (i >= 0 && i < count())
 			return nth1(i);
@@ -120,41 +123,9 @@ implements IHashEq implements IEqual {
 		}
 	}
 
-	public function remove(i:Int):Any {
-		throw new UnsupportedOperationException();
-	}
-
-	public function count():Int {
-		throw new UnsupportedOperationException("Must be implemented in subclasses.");
-	}
-
-	public function cons(o:Any):IPersistentVector {
-		throw new UnsupportedOperationException("Must be implemented in subclasses.");
-	}
-
-	public function empty():IPersistentCollection {
-		throw new UnsupportedOperationException("Must be implemented in subclasses.");
-	}
-
-	public function equiv(o:Any):Bool {
-		throw new UnsupportedOperationException("Must be implemented in subclasses.");
-	}
-
-	public function pop():IPersistentStack {
-		throw new UnsupportedOperationException("Must be implemented in subclasses.");
-	}
-
-	public function length():Int {
-		throw new UnsupportedOperationException("Must be implemented in subclasses.");
-	}
-
-	public function assocN(i:Int, val:Any):IPersistentVector {
-		throw new UnsupportedOperationException("Must be implemented in subclasses.");
-	}
-
 	public function indexOf(o:Any):Int {
 		var i:Int = 0;
-		while (i < count()) {
+		while (i < this.count()) {
 			if (Util.equiv(nth1(i), o))
 				return i;
 			i++;
@@ -238,6 +209,10 @@ implements IHashEq implements IEqual {
 		}
 		return notFound;
 	}
+
+	public function length():Int {
+		return count();
+	}
 }
 
 // === RangedIterator ========================================================
@@ -276,11 +251,11 @@ class Seq extends ASeq implements IndexedSeq implements IReduce {
 		this.i = i;
 	}
 
-	override public function first():Any {
+	public function first():Any {
 		return v.nth(i);
 	}
 
-	override public function next():ISeq {
+	public function next():ISeq {
 		if (i + 1 < v.count())
 			return new APersistentVector.Seq(v, i + 1);
 		return null;
@@ -338,11 +313,11 @@ class RSeq extends ASeq implements IndexedSeq implements Counted {
 		this.i = i;
 	}
 
-	override public function first():Any {
+	public function first():Any {
 		return v.nth(i);
 	}
 
-	override public function next():ISeq {
+	public function next():ISeq {
 		if (i > 0)
 			return new APersistentVector.RSeq(v, i - 1);
 		return null;
@@ -404,13 +379,13 @@ class SubVector extends APersistentVector implements IObj implements IKVReduce {
 		return init;
 	}
 
-	override public function nth1(i:Int):Any {
+	public function nth1(i:Int):Any {
 		if ((start + i >= end) || (i < 0))
 			throw new IndexOutOfBoundsException();
 		return v.nth(start + i);
 	}
 
-	override public function assocN(i:Int, val:Any):IPersistentVector {
+	public function assocN(i:Int, val:Any):IPersistentVector {
 		if (start + i > end)
 			throw new IndexOutOfBoundsException();
 		else if (start + i == end)
@@ -418,19 +393,19 @@ class SubVector extends APersistentVector implements IObj implements IKVReduce {
 		return new SubVector(_meta, v.assocN(start + i, val), start, end);
 	}
 
-	override public function count():Int {
+	public function count():Int {
 		return end - start;
 	}
 
-	override public function cons(o:Any):IPersistentVector {
+	public function cons(o:Any):IPersistentVector {
 		return new SubVector(_meta, v.assocN(end, o), start, end + 1);
 	}
 
-	override public function empty():IPersistentCollection {
+	public function empty():IPersistentCollection {
 		return PersistentVector.EMPTY.withMeta(this.meta());
 	}
 
-	override public function pop():IPersistentStack {
+	public function pop():IPersistentStack {
 		if (end - 1 == start) {
 			return PersistentVector.EMPTY;
 		}

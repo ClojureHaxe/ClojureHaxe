@@ -24,14 +24,14 @@ class ArraySeq extends ASeq implements IndexedSeq implements IReduce {
 		this.array = cast array;
 	}
 
-	override public function first():Any {
+	public function first():Any {
 		if (array != null) {
 			return array[i];
 		}
 		return null;
 	}
 
-	override public function next():ISeq {
+	public function next():ISeq {
 		if (array != null && i + 1 < array.length)
 			return new ArraySeq(array, i + 1);
 		return null;

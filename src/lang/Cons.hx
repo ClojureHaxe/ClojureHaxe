@@ -10,11 +10,11 @@ final class Cons extends ASeq {
 		this._more = _more;
 	}
 
-	override public function first():Any {
+	public function first():Any {
 		return _first;
 	}
 
-	override public function next():ISeq {
+	public function next():ISeq {
 		return more().seq();
 	}
 
