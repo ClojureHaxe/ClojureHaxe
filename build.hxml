@@ -1,6 +1,6 @@
 -cp src
 -main Main
-# --dce full
+--dce full
 
 --each
 
@@ -22,8 +22,8 @@
 # --java bin/java
 # --next
 
---js bin/js/main.js
---next
+# --js bin/js/main.js
+# --next
 
 # --python bin/python/main.py
 # --next

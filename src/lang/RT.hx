@@ -1,5 +1,7 @@
 package lang;
 
+import haxe.ds.Vector;
+
 class RT {
 	static public final EMPTY_ARRAY:Array<Any> = new Array<Any>();
 
@@ -57,26 +59,25 @@ class RT {
 			sb.add('(');
 			printInnerSeq(seq(x), sb);
 			sb.add(')');
-		} else 
-		//if (Std.isOfType(x, IPersistentVector)) 
-			if (U.instanceof(x, IPersistentVector)) 
-			{
+		} else
+			// if (Std.isOfType(x, IPersistentVector))
+			if (U.instanceof(x, IPersistentVector)) {
 				trace("print cast to vector yes!");
-			var a:IPersistentVector = cast(x, IPersistentVector);
-			var i:Int = 0;
-			sb.add("[");
-			while (i < a.count()) {
-				print(a.nth(i), sb);
-				if (i < a.count() - 1) {
-					sb.add(' ');
+				var a:IPersistentVector = cast(x, IPersistentVector);
+				var i:Int = 0;
+				sb.add("[");
+				while (i < a.count()) {
+					print(a.nth(i), sb);
+					if (i < a.count() - 1) {
+						sb.add(' ');
+					}
+					i++;
 				}
-				i++;
+				sb.add("]");
+			} else {
+				sb.add('$x');
+				// sb.add(Std.string(x));
 			}
-			sb.add("]");
-		} else {
-			sb.add('$x');
-			// sb.add(Std.string(x));
-		}
 	}
 
 	private static function printInnerSeq(x:ISeq, sb:StringBuf) {
@@ -171,5 +172,27 @@ class RT {
 
 	static public function isReduced(r:Any):Bool {
 		return U.instanceof(r, Reduced);
+	}
+
+	static public function length(list:ISeq):Int {
+		var i:Int = 0;
+		var c:ISeq = list;
+		while (c != null) {
+			i++;
+			c = c.next();
+		}
+		return i;
+	}
+
+	static public function seqToArray(seq:ISeq):Vector<Any> {
+		var len:Int = length(seq);
+		var ret:Vector<Any> = new Vector<Any>(len);
+		var i:Int = 0;
+		while (seq != null) {
+			ret[i] = seq.first();
+			++i;
+			seq = seq.next();
+		}
+		return ret;
 	}
 }

@@ -3,7 +3,7 @@ package lang;
 import lang.exceptions.UnsupportedOperationException;
 import lang.exceptions.IndexOutOfBoundsException;
 
-class AMapEntry extends APersistentVector implements IMapEntry {
+abstract class AMapEntry extends APersistentVector implements IMapEntry {
 	override public function nth1(i:Int):Any {
 		if (i == 0)
 			return key();

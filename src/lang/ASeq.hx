@@ -2,7 +2,7 @@ package lang;
 
 import haxe.Exception;
 
-class ASeq extends Obj implements ISeq implements Sequential // TODO:
+abstract class ASeq extends Obj implements ISeq implements Sequential // TODO:
 // implements List
 // implements Serializable
 implements IHashEq {
@@ -76,6 +76,7 @@ implements IHashEq {
 		return s;
 	}
 
+	
 	public function first():Any {
 		throw new Exception("ASeq.first() implemented in subclassed.");
 		return null;
@@ -89,4 +90,7 @@ implements IHashEq {
 	public function hasNext():Bool {
 		return next() != null;
 	}
+
+	
 }
+

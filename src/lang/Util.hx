@@ -51,4 +51,14 @@ class Util {
 			|| x instanceof BigInteger; */
 		return x is Int;
 	}
+
+	static public function hash(o):Int {
+       /* if (o == null)
+            return 0;
+        return o.hashCode();
+		*/
+		//TODO:
+		return 0;
+    }
+
 }

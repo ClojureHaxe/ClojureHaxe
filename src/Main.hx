@@ -18,6 +18,8 @@ import lang.Keyword;
 import lang.*;
 import lang.APersistentVector;
 import lang.PersistentVector;
+import lang.APersistentSet;
+import lang.PersistentHashSet;
 
 class Main {
 	static function main() {

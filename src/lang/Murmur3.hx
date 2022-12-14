@@ -73,10 +73,10 @@ final class Murmur3 {
 		return mixCollHash(hash, n);
 	}
 
-	public static function hashUnordered(xs:Iterator<Any>):Int {
+	public static function hashUnordered(xs:Iterable<Any>):Int {
 		var hash:Int = 0;
 		var n:Int = 0;
-		for (x in xs) {
+		for (x in xs.iterator()) {
 			hash += Util.hasheq(x);
 			++n;
 		}
