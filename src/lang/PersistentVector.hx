@@ -391,7 +391,7 @@ class ChunkedSeq extends ASeq implements IChunkedSeq implements Counted implemen
 		return vec.cnt - (i + offset);
 	}
 
-	public function iterator():Iterator<Any> {
+	override public function iterator():Iterator<Any> {
 		return vec.rangedIterator(i + offset, vec.cnt);
 	}
 

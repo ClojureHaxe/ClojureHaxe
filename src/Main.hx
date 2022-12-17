@@ -20,6 +20,7 @@ import lang.APersistentVector;
 import lang.PersistentVector;
 import lang.APersistentSet;
 import lang.PersistentHashSet;
+import lang.PersistentHashMap;
 
 class Main {
 	static function main() {
@@ -64,27 +65,38 @@ class Main {
 		p = p.cons(k2);
 		trace(p);
 
-
 		trace("========== PersistentVector ============");
 		var pp1:PersistentVector = PersistentVector.createFromISeq(p);
 		trace(U.instanceof(pp1, IPersistentVector));
 		trace(U.getClassName(pp1));
-		//trace(pp1.toString());
+		// trace(pp1.toString());
 		trace(pp1);
-		
-		//Sys.println(pp1);
-		
+
+		// Sys.println(pp1);
+
 		var pp2:Any = pp1;
 		trace(U.instanceof(pp2, IPersistentVector));
 		trace(RT.printString(pp2));
 
-		var pp3:PersistentVector = PersistentVector.createFromItems(1,2,3);
+		var pp3:PersistentVector = PersistentVector.createFromItems(1, 2, 3);
 		pp3 = pp3.cons(pp3);
 		trace(pp3);
 
-		//var pp3 = PersistentVector.createFromItems(pp1, pp2, p);
-		//trace(pp3);
-		
-
+		// var pp3 = PersistentVector.createFromItems(pp1, pp2, p);
+		// trace(pp3);
+		trace("=============== PersistentHashMap ============");
+		var hm:IPersistentMap = PersistentHashMap.create(1, 2, 3, 4);
+		hm = cast hm.assoc(Keyword.create(null, "hello"), pp1);
+		trace(hm.count());
+		trace(hm);
+		// trace(hm.toString());
+		/*for (v in hm.iterator()){
+			trace("iter", v);
+		}*/
+		/*
+			trace("=============== PersistentHashMap ============");
+			var hs:PersistentHashSet = PersistentHashSet.create(1,2,3);
+			trace(hs);
+		 */
 	}
 }

@@ -87,7 +87,7 @@ class PersistentHashSet extends APersistentSet implements IObj implements IEdita
 	public function cons(o:Any):IPersistentSet {
 		if (contains(o))
 			return this;
-		return new PersistentHashSet(meta(), impl.assoc(o, o));
+		return new PersistentHashSet(meta(), cast impl.assoc(o, o));
 	}
 
 	public function empty():IPersistentCollection {

@@ -1,35 +1,35 @@
 -cp src
 -main Main
---dce full
+# --dce full
 
 --each
 
 # --jvm bin/jvm/main.jar
 # --next
 
-# --php bin/php
-# --next 
-
 # --cs bin/cs
 # --next
 
-# --lua bin/lua/main.lua
-# --next
+--php bin/php
+--next 
 
-# --hl bin/hl/main.hl 
-# --next
+--lua bin/lua/main.lua
+--next
 
-# --java bin/java
-# --next
+--hl bin/hl/main.hl 
+--next
 
-# --js bin/js/main.js
-# --next
+--java bin/java
+--next
 
-# --python bin/python/main.py
-# --next
+--js bin/js/main.js
+--next
 
-# --cpp bin/cpp/
-# --next
+--python bin/python/main.py
+--next
+
+--cpp bin/cpp/
+--next
 
 
 --interp

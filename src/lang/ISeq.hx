@@ -1,6 +1,6 @@
 package lang;
 
-interface ISeq extends IPersistentCollection {
+interface ISeq extends IPersistentCollection /* extends  IEqual */ {
 	public function first():Any;
 
 	public function next():ISeq;

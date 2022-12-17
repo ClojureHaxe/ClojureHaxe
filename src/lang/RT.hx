@@ -9,6 +9,34 @@ class RT {
 		return null;
 	}
 
+	static public function cons(x:Any, coll:Any):ISeq {
+		// ISeq y = seq(coll);
+		if (coll == null)
+			return new PersistentList(x);
+		else if (U.instanceof(coll, ISeq))
+			return new Cons(x, cast coll);
+		else
+			return new Cons(x, seq(coll));
+	}
+
+	static public function first(x:Any) {
+		if (U.instanceof(x, ISeq))
+			return (cast x).first();
+		var seq:ISeq = seq(x);
+		if (seq == null)
+			return null;
+		return seq.first();
+	}
+
+	static public function next(x:Any):ISeq {
+		if (U.instanceof(x, ISeq))
+			return (cast x).next();
+		var seq:ISeq = seq(x);
+		if (seq == null)
+			return null;
+		return seq.next();
+	}
+
 	static public function printString(x:Any):String {
 		var sb:StringBuf = new StringBuf();
 		print(x, sb);
@@ -54,15 +82,28 @@ class RT {
 				i++;
 			}
 			sb.add('"');
-			// sb.add(x);
 		} else if (U.instanceof(x, ISeq) || U.instanceof(x, IPersistentList)) {
 			sb.add('(');
 			printInnerSeq(seq(x), sb);
 			sb.add(')');
+		} else if (U.instanceof(x, IPersistentMap) || (U.instanceof(x, PersistentHashMap))) {
+			sb.add("{");
+			var s:ISeq = seq(x);
+			while (s != null) {
+				var e:IMapEntry = s.first();
+				print(e.key(), sb);
+				sb.add(" ");
+				print(e.val(), sb);
+				if (s.next() != null) {
+					sb.add(", ");
+				}
+				s = s.next();
+			}
+			sb.add("}");
 		} else
 			// if (Std.isOfType(x, IPersistentVector))
 			if (U.instanceof(x, IPersistentVector)) {
-				trace("print cast to vector yes!");
+				// trace("print cast to vector yes!");
 				var a:IPersistentVector = cast(x, IPersistentVector);
 				var i:Int = 0;
 				sb.add("[");
@@ -92,6 +133,15 @@ class RT {
 		}
 	}
 
+	public static final CHUNK_SIZE = 32;
+
+	public static function chunkIteratorSeq(iter:Iterator<Any>):ISeq {
+		if (iter.hasNext()) {
+			return LazySeq.createFromFn(new ChunkIteratorSeqLazySeqAFn(iter));
+		}
+		return null;
+	}
+
 	static public function seq(coll:Any):ISeq {
 		if (U.instanceof(coll, ASeq))
 			return cast(coll, ASeq);
@@ -107,10 +157,9 @@ class RT {
 			return cast(coll, Seqable).seq();
 		else if (coll == null)
 			return null;
-			// TODO
-
-			// else if (coll instanceof Iterable)
-			//     return chunkIteratorSeq(((Iterable) coll).iterator());
+		else if (U.isIterable(coll))
+			// return null;
+			return chunkIteratorSeq((cast coll).iterator());
 			// else if (coll.getClass().isArray())
 			//     return ArraySeq.createFromObject(coll);
 			// else if (coll instanceof CharSequence)
@@ -194,5 +243,21 @@ class RT {
 			seq = seq.next();
 		}
 		return ret;
+	}
+}
+
+class ChunkIteratorSeqLazySeqAFn extends AFn {
+	var iter:Iterator<Any>;
+
+	public function new(iter:Iterator<Any>) {
+		this.iter = iter;
+	}
+
+	override public function invoke0():Any {
+		var arr:Vector<Any> = new Vector<Any>(RT.CHUNK_SIZE);
+		var n:Int = 0;
+		while (iter.hasNext() && n < RT.CHUNK_SIZE)
+			arr[n++] = iter.next();
+		return new ChunkedCons(new ArrayChunk(arr, 0, n), RT.chunkIteratorSeq(iter));
 	}
 }

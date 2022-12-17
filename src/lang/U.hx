@@ -2,6 +2,7 @@ package lang;
 
 import Type.ValueType;
 import haxe.ds.Vector;
+
 // Becuase Haxe doesn't allow to overload functions with different args count,
 // it needs to declare a function with maximum possible arguments.
 // And to distinguish the absense of arg from nil we need special default value.
@@ -18,6 +19,23 @@ class U {
 
 	public inline static function getClassName(v:Any):String {
 		return Type.getClassName(Type.getClass(v));
+	}
+
+	public inline static function isIterable(v:Any):Bool {
+		return (try {
+			(cast v).iterator();
+		} catch (e) {
+			null;
+		}) != null;
+	}
+
+	public inline static function getIterator(v:Any):Iterator<Any> {
+		var iter:Iterator<Any> = try {
+			(cast v).iterator();
+		} catch (e) {
+			null;
+		}
+		return iter;
 	}
 
 	public static function typeName(v:Any):String {

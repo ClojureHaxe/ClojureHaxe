@@ -61,11 +61,11 @@ final class Murmur3 {
 		return fmix(h1, count);
 	}
 
-	public static function hashOrdered<T>(xs:Iterator<T>):Int {
+	public static function hashOrdered<T>(xs:Iterable<T>):Int {
 		var n = 0;
 		var hash = 1;
 
-		for (x in xs) {
+		for (x in xs.iterator()) {
 			hash = 31 * hash + Util.hasheq(x);
 			++n;
 		}

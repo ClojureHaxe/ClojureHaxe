@@ -32,7 +32,7 @@ abstract class APersistentMap extends AFn implements IPersistentMap // implement
 		var es:ISeq = RT.seq(o);
 		while (es != null) {
 			var e:Map.Entry = cast(es.first(), Map.Entry);
-			ret = ret.assoc(e.getKey(), e.getValue());
+			ret = cast ret.assoc(e.getKey(), e.getValue());
 			es = es.next();
 		}
 		return ret;
@@ -143,11 +143,11 @@ abstract class APersistentMap extends AFn implements IPersistentMap // implement
         throw new UnsupportedOperationException();
     }
 
-    public function containsValue( value:Any):Bool{
+    /*public function containsValue( value:Any):Bool{
         // TODO://
         // return values().contains(value);
         return null;
-    }
+    }*/
 
     // TODO:
     // public Set entrySet() {
@@ -271,12 +271,12 @@ class KeySeq extends ASeq {
 		this.iterable = iterable;
 	}
 
-	override public function first():Any {
+	public function first():Any {
 		return cast(_seq.first(), Map.Entry).getKey();
 	}
 
     // TODO: fix return type IPersistentMap
-	override public function next():ISeq {
+	public function next():ISeq {
 		return cast create(_seq.next());
 	}
 
@@ -286,7 +286,7 @@ class KeySeq extends ASeq {
 		return new KeySeq(_seq, iterable, meta);
 	}
 
-	public function iterator():Iterator<Any> {
+	override public function iterator():Iterator<Any> {
 		// TODO:
 		// if (iterable == null)
 		//		return cast(super, Iterable).iterator();
@@ -345,11 +345,11 @@ class ValSeq extends ASeq {
 		this.iterable = iterable;
 	}
 
-	override public function first():Any {
+	public function first():Any {
 		return cast(_seq.first(), Map.Entry).getValue();
 	}
 
-	override public function next():ISeq {
+	public function next():ISeq {
 		return create(_seq.next());
 	}
 
@@ -359,7 +359,7 @@ class ValSeq extends ASeq {
 		return new ValSeq(_seq, iterable, meta);
 	}
 
-	public function iterator():Iterator<Any> {
+	override public function iterator():Iterator<Any> {
 		// TODO:
 		// if (iterable == null)
 		//	return super.iterator();

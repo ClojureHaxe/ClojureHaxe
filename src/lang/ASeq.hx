@@ -44,7 +44,7 @@ implements IHashEq {
 	public function hasheq():Int {
 		if (_hasheq == 0) {
 			// TODO: check if work
-			_hasheq = Murmur3.hashOrdered(cast this);
+			_hasheq = Murmur3.hashOrdered(this);
 		}
 		return _hasheq;
 	}
@@ -76,4 +76,8 @@ implements IHashEq {
 			return PersistentList.EMPTY;
 		return s;
 	}
+
+	public function iterator():Iterator<Any> {
+        return new SeqIterator(this);
+    }
 }
