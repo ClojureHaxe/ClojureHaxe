@@ -74,6 +74,19 @@ class U {
 	static public inline function vectorCopy(src:Vector<Any>, srcPos:Int, dst:Vector<Any>, dstPos:Int, l:Int) {
 		Vector.blit(src, srcPos, dst, dstPos, l);
 	}
+
+	static public inline function vectorCopyOf(src:Vector<Any>, newLen:Int):Vector<Any> {
+		var v:Vector<Any> = new Vector<Any>(newLen);
+		var i:Int = 0;
+		while (i < src.length || i < newLen) {
+			v[i] = src[i];
+			i++;
+		}
+		while (i < newLen) {
+			v[i] = null;
+		}
+		return v;
+	}
 }
 
 // class EmptyArg {

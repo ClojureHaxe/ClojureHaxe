@@ -1,5 +1,8 @@
 package lang;
 
+import lang.PersistentHashMap.ArrayNode;
+import lang.exceptions.RuntimeException;
+
 class Util {
 	static public function equiv(k1:Any, k2:Any):Bool {
 		if (k1 == k2)
@@ -13,6 +16,31 @@ class Util {
 		//     return k1.equals(k2);
 		// }
 		return false;
+	}
+
+	static final equivNull:EquivPred = new EquivPredNull();
+	static final equivEquals:EquivPred = new EquivPredEquals();
+	static final equivNumber:EquivPred = new EquivPredNumber();
+	static final equivColl:EquivPred = new EquivPredColl();
+
+	static public function equivPred(k1:Any):EquivPred {
+		if (k1 == null)
+			return equivNull;
+			// TODO:
+			// else if (U.instanceof(k1, Number))
+		//    return equivNumber;
+		else if (U.instanceof(k1, String) || U.instanceof(k1, Symbol))
+			return equivEquals;
+		// TODO:
+		// else if (U.instanceof(k1, Collection) || U.instanceof(k1, Map))
+		//    return equivColl;
+		return equivEquals;
+	}
+
+	static public function pcequiv(k1:Any, k2:Any):Bool {
+		if (U.instanceof(k1, IPersistentCollection))
+			return cast(k1, IPersistentCollection).equiv(k2);
+		return cast(k2, IPersistentCollection).equiv(k1);
 	}
 
 	// TODO: write String wrapper with _hash field hashed
@@ -53,7 +81,7 @@ class Util {
 		// trace("Utis/hasheq", U.getClassName(o), U.instanceof(o, IHashEq));
 		if (o == null)
 			return 0;
-		if (U.instanceof(o, IHashEq)){
+		if (U.instanceof(o, IHashEq)) {
 			// trace("Utils/hasheq IHasheq: ", cast(o, IHashEq).hasheq());
 			return cast(o, IHashEq).hasheq();
 		}
@@ -96,5 +124,48 @@ class Util {
 		 */
 		// TODO:
 		return 0;
+	}
+
+	static public function runtimeException(s:String):RuntimeException {
+		return new RuntimeException(s);
+	}
+}
+
+interface EquivPred {
+	public function equiv(k1:Any, k2:Any):Bool;
+}
+
+class EquivPredNull implements EquivPred {
+	public function new() {}
+
+	public function equiv(k1:Any, k2:Any):Bool {
+		return k2 == null;
+	}
+}
+
+class EquivPredEquals implements EquivPred {
+	public function new() {}
+
+	public function equiv(k1:Any, k2:Any):Bool {
+		return cast(k1, IEqual).equals(k2);
+	}
+}
+
+class EquivPredNumber implements EquivPred {
+	public function new() {}
+
+	public function equiv(k1:Any, k2:Any):Bool {
+		// TODO: NUmbers
+		return k1 == k2;
+	}
+}
+
+class EquivPredColl implements EquivPred {
+	public function new() {}
+
+	public function equiv(k1:Any, k2:Any):Bool {
+		if (U.instanceof(k1, IPersistentCollection) || U.instanceof(k2, IPersistentCollection))
+			return Util.pcequiv(k1, k2);
+		return cast(k1, IEqual).equals(k2);
 	}
 }

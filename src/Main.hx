@@ -100,5 +100,12 @@ class Main {
 		trace(hs.count());
 		trace(hs);
 		trace(hs.toString());
+
+		trace("=============== PersistentArrayMAp ============");
+		// var hs:PersistentHashSet = PersistentHashSet.create(1, 2, 3);
+		var pam:PersistentArrayMap = PersistentArrayMap.create("a", "b", "c", "d", "e", hm);
+		trace(pam.count());
+		trace(pam);
+		trace(pam.toString());
 	}
 }

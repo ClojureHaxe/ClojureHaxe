@@ -121,11 +121,11 @@ abstract class APersistentMap extends AFn implements IPersistentMap // implement
 		return cached;
 	}
 
-	static final MAKE_ENTRY:IFn = new MakeEntryFN();
+	public static final MAKE_ENTRY:IFn = new MakeEntryFN();
 
-	static final MAKE_KEY:IFn = new MakeKeyFN();
+	public static final MAKE_KEY:IFn = new MakeKeyFN();
 
-	static final MAKE_VAL:IFn = new MakeValFN();
+	public static final MAKE_VAL:IFn = new MakeValFN();
 
 
 
