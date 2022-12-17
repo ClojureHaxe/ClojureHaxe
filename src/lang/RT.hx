@@ -1,5 +1,6 @@
 package lang;
 
+import lang.exceptions.IllegalArgumentException;
 import haxe.ds.Vector;
 
 class RT {
@@ -100,25 +101,33 @@ class RT {
 				s = s.next();
 			}
 			sb.add("}");
-		} else
-			// if (Std.isOfType(x, IPersistentVector))
-			if (U.instanceof(x, IPersistentVector)) {
-				// trace("print cast to vector yes!");
-				var a:IPersistentVector = cast(x, IPersistentVector);
-				var i:Int = 0;
-				sb.add("[");
-				while (i < a.count()) {
-					print(a.nth(i), sb);
-					if (i < a.count() - 1) {
-						sb.add(' ');
-					}
-					i++;
+		} else if (U.instanceof(x, IPersistentVector)) {
+			// trace("print cast to vector yes!");
+			var a:IPersistentVector = cast(x, IPersistentVector);
+			var i:Int = 0;
+			sb.add("[");
+			while (i < a.count()) {
+				print(a.nth(i), sb);
+				if (i < a.count() - 1) {
+					sb.add(' ');
 				}
-				sb.add("]");
-			} else {
-				sb.add('$x');
-				// sb.add(Std.string(x));
+				i++;
 			}
+			sb.add("]");
+		} else if (U.instanceof(x, IPersistentSet)) {
+			sb.add("#{");
+			var s:ISeq = seq(x);
+			while (s != null) {
+				print(s.first(), sb);
+				if (s.next() != null)
+					sb.add(" ");
+				s = s.next();
+			}
+			sb.add('}');
+		} else {
+			sb.add('$x');
+			// sb.add(Std.string(x));
+		}
 	}
 
 	private static function printInnerSeq(x:ISeq, sb:StringBuf) {
@@ -145,9 +154,8 @@ class RT {
 	static public function seq(coll:Any):ISeq {
 		if (U.instanceof(coll, ASeq))
 			return cast(coll, ASeq);
-			// TODO
-			// else if (U.instanceof(call, LazySeq))
-		//    return ((LazySeq) coll).seq();
+		else if (U.instanceof(coll, LazySeq))
+			return cast(coll, LazySeq).seq();
 		else
 			return seqFrom(coll);
 	}
@@ -158,7 +166,6 @@ class RT {
 		else if (coll == null)
 			return null;
 		else if (U.isIterable(coll))
-			// return null;
 			return chunkIteratorSeq((cast coll).iterator());
 			// else if (coll.getClass().isArray())
 			//     return ArraySeq.createFromObject(coll);
@@ -167,7 +174,7 @@ class RT {
 			// else if (coll instanceof Map)
 		//     return seq(((Map) coll).entrySet());
 		else {
-			throw new haxe.exceptions.ArgumentException("Don't know how to create ISeq from: " + Type.getClassName(Type.getClass(coll)));
+			throw new IllegalArgumentException("Don't know how to create ISeq from: " + Type.getClassName(Type.getClass(coll)));
 		}
 		return null;
 	}
@@ -217,6 +224,13 @@ class RT {
 		return 0;
 
 		// throw new UnsupportedOperationException("count not supported on this type: " + o.getClass().getSimpleName());
+	}
+
+	static public function keys(coll:Any):ISeq {
+		if (U.instanceof(coll, IPersistentMap))
+			return APersistentMap.KeySeq.createFromMap(cast coll);
+		else
+			return APersistentMap.KeySeq.create(seq(coll));
 	}
 
 	static public function isReduced(r:Any):Bool {

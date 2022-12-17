@@ -6,13 +6,11 @@ import lang.exceptions.UnsupportedOperationException;
 import lang.exceptions.NoSuchElementException;
 import lang.exceptions.IllegalArgumentException;
 
-abstract class APersistentVector extends AFn implements IPersistentVector // implements Iterable
-// implements List
-implements RandomAccess // implements Comparable
-// implements Serializable
-implements IHashEq implements IEqual {
-	var _hash:Int;
-	var _hasheq:Int;
+abstract class APersistentVector extends AFn implements IPersistentVector implements RandomAccess implements IHashEq
+		implements IEqual // implements Comparable  implements Serializable implements Iterable implements List
+{
+	var _hash:Int = 0;
+	var _hasheq:Int = 0;
 
 	public function toString():String {
 		return RT.printString(this);

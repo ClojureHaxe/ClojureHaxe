@@ -887,11 +887,13 @@ class BitmapIndexedNode implements INode {
 	public function assoc6(edit:AtomicReference, shift:Int, hash:Int, key:Any, val:Any, addedLeaf:Box):INode {
 		var bit:Int = PersistentHashMap.bitpos(hash, shift);
 		var idx:Int = index(bit);
+		// trace("BitmapNode assoc6 : ", key, idx, (bitmap & bit) != 0);
+		// trace(array);
 		if ((bitmap & bit) != 0) {
 			var keyOrNull:Any = array[2 * idx];
 			var valOrNode:Any = array[2 * idx + 1];
 			if (keyOrNull == null) {
-				var n:INode = (cast valOrNode).assoc(edit, shift + 5, hash, key, val, addedLeaf);
+				var n:INode = cast(valOrNode, INode).assoc6(edit, shift + 5, hash, key, val, addedLeaf);
 				if (n == valOrNode)
 					return this;
 				return editAndSet3(edit, 2 * idx + 1, n);

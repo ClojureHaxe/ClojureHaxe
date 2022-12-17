@@ -7,9 +7,7 @@ import lang.exceptions.IllegalArgumentException;
 import lang.exceptions.IllegalStateException;
 import lang.exceptions.NoSuchElementException;
 
-class PersistentVector extends APersistentVector implements IObj implements IEditableCollection
-		implements IReduce /*implements IKVReduce 
-	implements  IDrop */ {
+class PersistentVector extends APersistentVector implements IObj implements IEditableCollection implements IReduce implements IKVReduce implements IDrop {
 	public var cnt:Int;
 	public var shift:Int;
 	public var root:Node;

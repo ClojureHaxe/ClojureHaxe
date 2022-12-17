@@ -29,9 +29,7 @@ abstract class APersistentSet extends AFn implements IPersistentSet implements I
 	}
 
 	public function seq():ISeq {
-		// TODO:
-		// return RT.keys(impl);
-		return null;
+		return RT.keys(impl);
 	}
 
 	override public function invoke1(arg1:Any):Any {

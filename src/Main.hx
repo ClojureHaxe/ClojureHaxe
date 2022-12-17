@@ -85,7 +85,7 @@ class Main {
 		// var pp3 = PersistentVector.createFromItems(pp1, pp2, p);
 		// trace(pp3);
 		trace("=============== PersistentHashMap ============");
-		var hm:IPersistentMap = PersistentHashMap.create(1, 2, 3, 4);
+		var hm:IPersistentMap = PersistentHashMap.create(1, 2, 3, 4, 5, 6, 7, 8);
 		hm = cast hm.assoc(Keyword.create(null, "hello"), pp1);
 		trace(hm.count());
 		trace(hm);
@@ -93,10 +93,12 @@ class Main {
 		/*for (v in hm.iterator()){
 			trace("iter", v);
 		}*/
-		/*
-			trace("=============== PersistentHashMap ============");
-			var hs:PersistentHashSet = PersistentHashSet.create(1,2,3);
-			trace(hs);
-		 */
+
+		trace("=============== PersistentHashSet ============");
+		// var hs:PersistentHashSet = PersistentHashSet.create(1, 2, 3);
+		var hs:PersistentHashSet = PersistentHashSet.create("a", "b", "c", "d", "e", hm, pp2);
+		trace(hs.count());
+		trace(hs);
+		trace(hs.toString());
 	}
 }

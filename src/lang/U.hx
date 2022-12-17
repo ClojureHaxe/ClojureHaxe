@@ -71,12 +71,8 @@ class U {
 	// public inline function instanceof2(v Any, c ):Bool {
 	// }
 
-	static public function vectorCopy(src:Vector<Any>, srcPos:Int, dst:Vector<Any>, dstPos:Int, l:Int) {
-		var i:Int = 0;
-		while (i < l) {
-			dst[dstPos + i] = src[srcPos + i];
-			i++;
-		}
+	static public inline function vectorCopy(src:Vector<Any>, srcPos:Int, dst:Vector<Any>, dstPos:Int, l:Int) {
+		Vector.blit(src, srcPos, dst, dstPos, l);
 	}
 }
 

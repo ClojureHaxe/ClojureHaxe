@@ -12,7 +12,7 @@ class PersistentHashSet extends APersistentSet implements IObj implements IEdita
 		var ret:ITransientSet = cast EMPTY.asTransient();
 		var i:Int = 0;
 		while (i < init.length) {
-			ret = cast(ret.conj(init[i]), ITransientSet);
+			ret = cast ret.conj(init[i]);
 			i++;
 		}
 		return cast ret.persistent();
@@ -101,9 +101,7 @@ class PersistentHashSet extends APersistentSet implements IObj implements IEdita
 	}
 
 	public function asTransient():ITransientCollection {
-		// TODO: Fix
-		//return new TransientHashSet(cast(impl, PersistentHashMap).asTransient());
-		return null;
+		return new TransientHashSet(cast(impl, PersistentHashMap).asTransient());
 	}
 
 	public function meta():IPersistentMap {
