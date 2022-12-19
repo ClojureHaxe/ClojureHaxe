@@ -72,13 +72,13 @@ abstract class APersistentVector extends AFn implements IPersistentVector implem
 	}
 
 	public function equals(obj:Any):Bool {
-		if (obj == this)
+		if (this == obj)
 			return true;
 		return doEquals(this, obj);
 	}
 
 	public function equiv(obj:Any):Bool {
-		if (obj == this)
+		if (this == obj)
 			return true;
 		// TODO: equiv
 		return equals(obj);

@@ -71,6 +71,8 @@ class Main {
 		trace(U.getClassName(pp1));
 		// trace(pp1.toString());
 		trace(pp1);
+		trace(pp1.equiv(10));
+		//trace(Util.equiv(pp1, "hello"));
 
 		// Sys.println(pp1);
 
@@ -107,5 +109,8 @@ class Main {
 		trace(pam.count());
 		trace(pam);
 		trace(pam.toString());
+
+		trace(Numbers.equiv(10, null));
+		trace(Util.classOf(pp2));
 	}
 }

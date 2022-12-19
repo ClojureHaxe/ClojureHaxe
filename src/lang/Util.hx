@@ -1,5 +1,7 @@
 package lang;
 
+import haxe.Exception;
+import Type.ValueType;
 import lang.PersistentHashMap.ArrayNode;
 import lang.exceptions.RuntimeException;
 
@@ -7,14 +9,16 @@ class Util {
 	static public function equiv(k1:Any, k2:Any):Bool {
 		if (k1 == k2)
 			return true;
-		// TODO
-		// if (k1 != null) {
-		//     if (k1 instanceof Number && k2 instanceof Number)
-		//         return Numbers.equal((Number) k1, (Number) k2);
-		//     else if (k1 instanceof IPersistentCollection || k2 instanceof IPersistentCollection)
-		//         return pcequiv(k1, k2);
-		//     return k1.equals(k2);
-		// }
+		if (k1 != null) {
+			if (U.isNumber(k1) && U.isNumber(k2))
+				return Numbers.equal(k1, k2);
+			else if (U.instanceof(k1, IPersistentCollection) || U.instanceof(k2, IPersistentCollection))
+				return pcequiv(k1, k2);
+			else
+				return false;
+			// if (U.instanceof());
+			// return k1.equals(k2);
+		}
 		return false;
 	}
 
@@ -26,14 +30,12 @@ class Util {
 	static public function equivPred(k1:Any):EquivPred {
 		if (k1 == null)
 			return equivNull;
-			// TODO:
-			// else if (U.instanceof(k1, Number))
-		//    return equivNumber;
+		else if (U.isNumber(k1))
+			return equivNumber;
 		else if (U.instanceof(k1, String) || U.instanceof(k1, Symbol))
 			return equivEquals;
-		// TODO:
-		// else if (U.instanceof(k1, Collection) || U.instanceof(k1, Map))
-		//    return equivColl;
+		else if (U.instanceof(k1, IPersistentCollection) || U.instanceof(k1, IPersistentCollection))
+			return equivColl;
 		return equivEquals;
 	}
 
@@ -41,6 +43,26 @@ class Util {
 		if (U.instanceof(k1, IPersistentCollection))
 			return cast(k1, IPersistentCollection).equiv(k2);
 		return cast(k2, IPersistentCollection).equiv(k1);
+	}
+
+	static public function equals(k1:Any, k2:Any):Bool {
+		if (k1 == k2)
+			return true;
+		return k1 != null && U.instanceof(k1, IEqual) && cast(k1, IEqual).equals(k2);
+	}
+
+	static public function identical(k1:Any, k2:Any):Bool {
+		return k1 == k2;
+	}
+
+	// TODO: doesnt work properly on several platforms (Python, NodeJS)
+	static public function classOf(x:Any):Class<Any> {
+		try {
+			// In lua it throws Exception for primitive types like Int
+			return Type.getClass(x);
+		} catch (e) {
+			return null;
+		}
 	}
 
 	// TODO: write String wrapper with _hash field hashed
@@ -77,31 +99,28 @@ class Util {
 		return hash;
 	}
 
+	public static function hash(o:Any):Int {
+		return hasheq(o);
+	}
+
 	public static function hasheq(o:Any):Int {
-		// trace("Utis/hasheq", U.getClassName(o), U.instanceof(o, IHashEq));
 		if (o == null)
 			return 0;
-		if (U.instanceof(o, IHashEq)) {
-			// trace("Utils/hasheq IHasheq: ", cast(o, IHashEq).hasheq());
+		if (U.instanceof(o, IHashEq))
 			return cast(o, IHashEq).hasheq();
-		}
-		// if (o instanceof Number)
-		//     return Numbers.hasheq((Number) o);
+		if (Type.typeof(o) == ValueType.TInt)
+			return Murmur3.hashInt(o);
+		if (Type.typeof(o) == ValueType.TFloat)
+			return Murmur3.hashFloat(o);
+		if (Type.typeof(o) == ValueType.TBool)
+			return cast o == true ? 1231 : 1237;
 		if (U.instanceof(o, String))
 			return Murmur3.hashInt(hashCodeString(cast o));
+		if (U.instanceof(o, Ratio))
+			return (cast(o, Ratio)).hashCode();
 		// return o.hashCode();
-		// TODO: smt
-		return 100;
-	}
-
-	public static function ret1(ret:Any, nil:Any):Any {
-		return ret;
-	}
-
-	static public function equals(k1:Any, k2:Any):Bool {
-		if (k1 == k2)
-			return true;
-		return k1 != null && U.instanceof(k1, IEqual) && cast(k1, IEqual).equals(k2);
+		// TODO: smt for classes
+		return Murmur3.hashUnencodedChars(U.getClassName(o));
 	}
 
 	static public function hashCombine(seed:Int, hash:Int):Int {
@@ -109,28 +128,25 @@ class Util {
 		return seed;
 	}
 
+	/*
+		static public function isPrimitive(Class c):Bool {
+			return c != null && c.isPrimitive() && !(c == Void.TYPE);
+		}
+	 */
 	static public function isInteger(x:Any):Bool {
-		/*return x instanceof Integer
-			|| x instanceof Long
-			|| x instanceof BigInt
-			|| x instanceof BigInteger; */
-		return x is Int;
+		return Std.isOfType(x, Int);
 	}
 
-	static public function hash(o):Int {
-		/* if (o == null)
-				return 0;
-			return o.hashCode();
-		 */
-		// TODO:
-		return 0;
+	public static function ret1(ret:Any, nil:Any):Any {
+		return ret;
 	}
 
-	static public function runtimeException(s:String):RuntimeException {
-		return new RuntimeException(s);
+	static public function runtimeException(s:String, ?e:Exception):RuntimeException {
+		return new RuntimeException(s, e);
 	}
 }
 
+// EquivPred =================================================================
 interface EquivPred {
 	public function equiv(k1:Any, k2:Any):Bool;
 }
@@ -147,7 +163,10 @@ class EquivPredEquals implements EquivPred {
 	public function new() {}
 
 	public function equiv(k1:Any, k2:Any):Bool {
-		return cast(k1, IEqual).equals(k2);
+		if (U.instanceof(k1, IEqual)) {
+			return cast(k1, IEqual).equals(k2);
+		}
+		return k1 == k2;
 	}
 }
 
@@ -155,8 +174,10 @@ class EquivPredNumber implements EquivPred {
 	public function new() {}
 
 	public function equiv(k1:Any, k2:Any):Bool {
-		// TODO: NUmbers
-		return k1 == k2;
+		if (U.isNumber(k2)) {
+			return Numbers.equal(k1, k2);
+		}
+		return false;
 	}
 }
 

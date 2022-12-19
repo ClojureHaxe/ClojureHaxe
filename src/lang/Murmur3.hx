@@ -14,6 +14,11 @@ final class Murmur3 {
 		return fmix(h1, 4);
 	}
 
+	// There is no hashCode for float in Haxe, so let it be this
+	public static function hashFloat(input:Float):Int {
+		return Std.int(input * 1000);
+	}
+
 	/*
 		public static function hashLong(input:Int64):Int {
 			if (input == 0) return 0;
@@ -30,7 +35,7 @@ final class Murmur3 {
 		}
 	 */
 	public static function hashUnencodedChars(input:String):Int {
-		if (input == null){
+		if (input == null) {
 			return 0;
 		}
 		var h1:Int = seed;

@@ -1,3 +1,4 @@
+// Some functions that help interact with Haxe
 package lang;
 
 import Type.ValueType;
@@ -19,6 +20,10 @@ class U {
 
 	public inline static function getClassName(v:Any):String {
 		return Type.getClassName(Type.getClass(v));
+	}
+
+	public static function isNumber(x):Bool {
+		return (Type.typeof(x) == ValueType.TInt || Type.typeof(x) == ValueType.TFloat || instanceof(x, Ratio));
 	}
 
 	public inline static function isIterable(v:Any):Bool {
