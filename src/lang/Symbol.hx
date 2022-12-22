@@ -2,8 +2,8 @@ package lang;
 
 class Symbol extends AFn implements IObj implements Named implements IHashEq {
 	// Comparable Serializable
-	var ns:String;
-	var name:String;
+	public var ns:String;
+	public var name:String;
 	var _hasheq:Int = 0;
 	var _meta:IPersistentMap;
 

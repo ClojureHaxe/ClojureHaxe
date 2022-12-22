@@ -24,7 +24,17 @@ implements Counted {
 	}
 
 	// TODO: use list vs array?
-	public static function create(init:Array<Any>):IPersistentList {
+	public static function createFromArray(init:Array<Any>):IPersistentList {
+		var ret:IPersistentList = EMPTY;
+		var i:Int = init.length - 1;
+		while (i >= 0) {
+			ret = cast(ret.cons(init[i]), IPersistentList);
+			i--;
+		}
+		return ret;
+	}
+
+	public static function create(...init:Any):IPersistentList {
 		var ret:IPersistentList = EMPTY;
 		var i:Int = init.length - 1;
 		while (i >= 0) {
@@ -127,7 +137,7 @@ class Primordial extends RestFn {
 			list.push(s.first());
 			s = s.next();
 		}
-		return PersistentList.create(list);
+		return PersistentList.createFromArray(list);
 	}
 
 	override public function withMeta(meta:IPersistentMap):IObj {

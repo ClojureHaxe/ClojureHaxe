@@ -4,6 +4,36 @@ import lang.exceptions.IllegalArgumentException;
 import haxe.ds.Vector;
 
 class RT {
+	static public final T:Bool = true;
+	static public final F:Bool = false;
+	static public final LOADER_SUFFIX:String = "__init";
+
+	static public final DEFAULT_IMPORTS:IPersistentMap = map();
+
+	static function readTrueFalseUnknown(s:String):Any {
+		if (s == ("true"))
+			return T;
+		else if (s == ("false"))
+			return F;
+		return Keyword.intern(null, "unknown");
+	}
+
+	static public final REQUIRE_LOCK:Any = new Obj();
+	static public final CLOJURE_NS:Namespace = Namespace.findOrCreate(Symbol.internNSname("clojure.core"));
+	static public final TAG_KEY:Keyword = Keyword.intern(null, "tag");
+
+	static public function errPrint(s:String) {
+		trace(s);
+	}
+
+	static public function map(...init:Any):IPersistentMap {
+		if (init == null || init.length == 0)
+			return PersistentArrayMap.EMPTY;
+		else if (init.length <= PersistentArrayMap.HASHTABLE_THRESHOLD)
+			return PersistentArrayMap.createWithCheck(init);
+		return PersistentHashMap.createWithCheck(init);
+	}
+
 	static public final EMPTY_ARRAY:Array<Any> = new Array<Any>();
 
 	public static function get(coll:Any, key:Any, ?notFound = null):Any {
@@ -258,6 +288,56 @@ class RT {
 		}
 		return ret;
 	}
+
+	static public function assoc(coll:Any, key:Any, val:Any):Associative {
+		if (coll == null) {
+			return PersistentArrayMap.create(key, val);
+		}
+		return cast(coll, Associative).assoc(key, val);
+	}
+
+	static public function dissoc(coll:Any, key:Any):Any {
+		if (coll == null)
+			return null;
+		return cast(coll, IPersistentMap).without(key);
+	}
+
+	// List stuff ==========================================================================
+	static public function list(...init:Any):ISeq
+		return PersistentList.create(...init).seq();
+
+	static public function list0():ISeq
+		return null;
+
+	static public function list1(arg1:Any):ISeq
+		return new PersistentList(arg1);
+
+	static public function list2(arg1:Any, arg2:Any):ISeq
+		return listStar3(arg1, arg2, null);
+
+	static public function list3(arg1:Any, arg2:Any, arg3:Any):ISeq
+		return listStar4(arg1, arg2, arg3, null);
+
+	static public function list4(arg1:Any, arg2:Any, arg3:Any, arg4:Any):ISeq
+		return listStar5(arg1, arg2, arg3, arg4, null);
+
+	static public function list5(arg1:Any, arg2:Any, arg3:Any, arg4:Any, arg5:Any):ISeq
+		return listStar6(arg1, arg2, arg3, arg4, arg5, null);
+
+	static public function listStar2(arg1:Any, rest:ISeq):ISeq
+		return cons(arg1, rest);
+
+	static public function listStar3(arg1:Any, arg2:Any, rest:ISeq):ISeq
+		return cons(arg1, cons(arg2, rest));
+
+	static public function listStar4(arg1:Any, arg2:Any, arg3:Any, rest:ISeq):ISeq
+		return cons(arg1, cons(arg2, cons(arg3, rest)));
+
+	static public function listStar5(arg1:Any, arg2:Any, arg3:Any, arg4:Any, rest:ISeq):ISeq
+		return cons(arg1, cons(arg2, cons(arg3, cons(arg4, rest))));
+
+	static public function listStar6(arg1:Any, arg2:Any, arg3:Any, arg4:Any, arg5:Any, rest:ISeq):ISeq
+		return cons(arg1, cons(arg2, cons(arg3, cons(arg4, cons(arg5, rest)))));
 }
 
 class ChunkIteratorSeqLazySeqAFn extends AFn {

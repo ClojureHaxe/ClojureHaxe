@@ -4,6 +4,7 @@ import lang.exceptions.IllegalArgumentException;
 import lang.exceptions.NoSuchElementException;
 import lang.exceptions.IllegalAccessError;
 import haxe.ds.Vector;
+import haxe.Rest;
 
 class PersistentArrayMap extends APersistentMap implements IObj implements IEditableCollection implements IMapIterable implements IKVReduce implements IDrop {
 	var array:Vector<Any>;
@@ -46,14 +47,15 @@ class PersistentArrayMap extends APersistentMap implements IObj implements IEdit
 			i++;
 		}
 		return new PersistentArrayMap(null, v);
-	}    
+	}
 
 	private function createHT(init:Vector<Any>):IPersistentMap {
 		return PersistentHashMap.create(meta(), init);
 	}
 
-	static public function createWithCheck(init:Vector<Any>):PersistentArrayMap {
+	static public function createWithCheck(...init):PersistentArrayMap {
 		var i:Int = 0;
+		var v:Vector<Any> = new Vector<Any>(init.length);
 		while (i < init.length) {
 			var j:Int = i + 2;
 			while (j < init.length) {
@@ -61,9 +63,11 @@ class PersistentArrayMap extends APersistentMap implements IObj implements IEdit
 					throw new IllegalArgumentException("Duplicate key: " + init[i]);
 				j += 2;
 			}
+			v[i] = init[i];
+			v[i + 1] = init[i + 1];
 			i += 2;
 		}
-		return PersistentArrayMap.createFromArray(init);
+		return PersistentArrayMap.createFromArray(v);
 	}
 
 	static public function createAsIfByAssoc(init:Vector<Any>):PersistentArrayMap {
@@ -457,8 +461,8 @@ final class TransientArrayMap extends ATransientMap {
 
 	public function new(array:Vector<Any>) {
 		this.owner = this; // this thread, but what the difference
-        var l:Int = PersistentArrayMap.HASHTABLE_THRESHOLD > array.length ? PersistentArrayMap.HASHTABLE_THRESHOLD : array.length;
-    	this.array = new Vector<Any>(l);
+		var l:Int = PersistentArrayMap.HASHTABLE_THRESHOLD > array.length ? PersistentArrayMap.HASHTABLE_THRESHOLD : array.length;
+		this.array = new Vector<Any>(l);
 		U.vectorCopy(array, 0, this.array, 0, array.length);
 		this.len = array.length;
 	}

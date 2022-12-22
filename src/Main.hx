@@ -21,6 +21,9 @@ import lang.PersistentVector;
 import lang.APersistentSet;
 import lang.PersistentHashSet;
 import lang.PersistentHashMap;
+import lang.AReference;
+
+import lang.Namespace;
 
 class Main {
 	static function main() {
@@ -111,6 +114,6 @@ class Main {
 		trace(pam.toString());
 
 		trace(Numbers.equiv(10, null));
-		trace(Util.classOf(pp2));
+		// trace(Util.classOf(pp2));
 	}
 }

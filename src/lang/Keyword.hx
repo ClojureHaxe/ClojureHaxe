@@ -23,6 +23,14 @@ class Keyword extends AFn implements IFn implements Named implements IHashEq {
 		return new Keyword(Symbol.createNSname(nsname));
 	}
 
+	public static function intern(ns:String, name:String) {
+		return new Keyword(Symbol.create(ns, name));
+	}
+
+	public static function internNSname(nsname:String) {
+		return new Keyword(Symbol.createNSname(nsname));
+	}
+
 	public function hashCode():Int {
 		return sym.hashCode() + 0x9e3779b9;
 	}
