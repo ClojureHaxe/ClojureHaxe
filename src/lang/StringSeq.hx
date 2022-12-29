@@ -22,11 +22,11 @@ class StringSeq extends ASeq implements IndexedSeq implements IDrop implements I
 		return new StringSeq(meta, s, i);
 	}
 
-	override public function first():Any {
-		return s.charCodeAt(i);
+	public function first():Any {
+		return s.charAt(i);
 	}
 
-	override public function next():ISeq {
+	public function next():ISeq {
 		if (i + 1 < s.length)
 			return new StringSeq(_meta, s, i + 1);
 		return null;

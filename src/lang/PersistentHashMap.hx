@@ -7,9 +7,7 @@ import lang.exceptions.IllegalAccessError;
 import haxe.ds.Vector;
 import haxe.Rest;
 
-class PersistentHashMap extends APersistentMap // implements IEditableCollection implements IObj
-// implements IMapIterable implements IKVReduce
-{
+class PersistentHashMap extends APersistentMap implements IEditableCollection implements IObj implements IMapIterable implements IKVReduce {
 	public var _count:Int;
 	public var root:INode;
 	public var hasNull:Bool;
@@ -382,7 +380,7 @@ class PersistentHashMapIterator {
 	public function next():Any {
 		if (!seen) {
 			seen = true;
-			return f.invoke(null, nullValue);
+			return f.invoke2(null, nullValue);
 		} else
 			return rootIter.next();
 	}

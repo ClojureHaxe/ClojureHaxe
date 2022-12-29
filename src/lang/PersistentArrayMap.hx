@@ -281,7 +281,8 @@ class PersistentArrayMap extends APersistentMap implements IObj implements IEdit
 	}
 
 	private function indexOf(key:Any):Int {
-		if (U.instanceof(key, Keyword)) {
+		// TODO: implement keyword properly?
+		/*if (U.instanceof(key, Keyword)) {
 			var i:Int = 0;
 			while (i < array.length) {
 				if (key == array[i])
@@ -289,8 +290,8 @@ class PersistentArrayMap extends APersistentMap implements IObj implements IEdit
 				i += 2;
 			}
 			return -1;
-		} else
-			return indexOfObject(key);
+		} else*/
+		return indexOfObject(key);
 	}
 
 	static public function equalKey(k1:Any, k2:Any):Bool {

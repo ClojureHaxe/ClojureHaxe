@@ -59,6 +59,20 @@ class PersistentHashSet extends APersistentSet implements IObj implements IEdita
 		return cast ret.persistent();
 	}
 
+	static public function createWithCheckFromIter(items:Iterator<Any>):PersistentHashSet {
+		var ret:ITransientSet = cast EMPTY.asTransient();
+		var i:Int = 0;
+		while (items.hasNext()) {
+			var val:Any = items.next();
+			ret = cast ret.conj(val);
+			if (ret.count() != i + 1)
+				throw new IllegalArgumentException("Duplicate key: " + val);
+			++i;
+		}
+		return cast ret.persistent();
+	}
+
+
 	static public function createWithCheckFromISeq(items:ISeq):PersistentHashSet {
 		var ret:ITransientSet = cast EMPTY.asTransient();
 		var i:Int = 0;

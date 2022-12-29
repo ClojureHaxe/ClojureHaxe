@@ -9,6 +9,9 @@
 	import lang.U;
  */
 
+import Map.IMap;
+import lang.Murmur3;
+import haxe.Int64;
 import lang.U;
 import lang.ArraySeq;
 import lang.RT;
@@ -22,98 +25,42 @@ import lang.APersistentSet;
 import lang.PersistentHashSet;
 import lang.PersistentHashMap;
 import lang.AReference;
-
 import lang.Namespace;
+import lang.EdnReader;
 
 class Main {
 	static function main() {
-		/*trace("Hello Haxe!!!");
-
-			var s = new Symbol("school", "user");
-			var s2 = Symbol.internNSname("school/user");
-			trace(s, s2);
-		 */
-
-		// trace(Type.getClass(s) == Type.getClass(s2));
-		// trace(Type.typeof(s) == Type.typeof(s2));
-		// trace(s.equals(s2));
-		// trace(s.equals(10));
 		// //trace(haxe.Log.formatOutput(20 ));
 
-		// trace(RT.printString(null));
 		// trace(U.instanceof(10, Int));
-		trace("=========== START ============");
-		var a1:ArraySeq = ArraySeq.create(1, 2, 3, 4);
-		var a2:ArraySeq = ArraySeq.create("1", "2", "3", "4");
-		var a3:ArraySeq = ArraySeq.create(1, "Hello", ArraySeq.create(10, 20, 30));
-		trace(a1.toString());
-		trace(a2.toString());
-		trace(a3.toString());
 
-		var types:Array<Any> = [10, 20.4, "Hello", true, null, a3];
+		// trace(Util.classOf(pp2));
+		readerTest();
+		// trace(EdnReader.readString("  \\zz", PersistentArrayMap.EMPTY));
+	}
+
+	private static function typesTest() {
+		trace("=========== START ============");
+
+		var types:Array<Any> = [10, 20.4, "Hello", true, null, ArraySeq.create(1, 2, 3)];
 
 		trace("===== TYPES =====");
 		for (i in types) {
 			trace('$i -  ${U.typeName(i)}');
 		}
+	}
 
-		var k:Keyword = Keyword.create("user", "age");
-		var k2:Keyword = Keyword.createNSname("key");
-		trace(k, k2);
+	private static function readerTest() {
+		trace("======================= EdnReader test ===================");
 
-		var p:PersistentList = new PersistentList("Hello");
-		trace(p.toString());
-		p = p.cons("1");
-		p = p.cons(k);
-		p = p.cons(k2);
-		trace(p);
+		/*var m =  new EReg("^([-+]?)(?:(0)|([1-9][0-9]*)|0[xX]([0-9A-Fa-f]+)|0([0-7]+)|([1-9][0-9]?)[rR]([0-9A-Za-z]+)|0[0-9]+)(N)?$", "");
 
-		trace("========== PersistentVector ============");
-		var pp1:PersistentVector = PersistentVector.createFromISeq(p);
-		trace(U.instanceof(pp1, IPersistentVector));
-		trace(U.getClassName(pp1));
-		// trace(pp1.toString());
-		trace(pp1);
-		trace(pp1.equiv(10));
-		//trace(Util.equiv(pp1, "hello"));
+			var m2 =  new EReg("^([-+]?)
+			(?:  (0) | ([1-9][0-9]*) |  0[xX]([0-9A-Fa-f]+) | 0([0-7]+) | ([1-9][0-9]?) [rR] ([0-9A-Za-z]+) | 0[0-9]+)  (N)?
 
-		// Sys.println(pp1);
+			$", "");
+		 */
 
-		var pp2:Any = pp1;
-		trace(U.instanceof(pp2, IPersistentVector));
-		trace(RT.printString(pp2));
-
-		var pp3:PersistentVector = PersistentVector.createFromItems(1, 2, 3);
-		pp3 = pp3.cons(pp3);
-		trace(pp3);
-
-		// var pp3 = PersistentVector.createFromItems(pp1, pp2, p);
-		// trace(pp3);
-		trace("=============== PersistentHashMap ============");
-		var hm:IPersistentMap = PersistentHashMap.create(1, 2, 3, 4, 5, 6, 7, 8);
-		hm = cast hm.assoc(Keyword.create(null, "hello"), pp1);
-		trace(hm.count());
-		trace(hm);
-		// trace(hm.toString());
-		/*for (v in hm.iterator()){
-			trace("iter", v);
-		}*/
-
-		trace("=============== PersistentHashSet ============");
-		// var hs:PersistentHashSet = PersistentHashSet.create(1, 2, 3);
-		var hs:PersistentHashSet = PersistentHashSet.create("a", "b", "c", "d", "e", hm, pp2);
-		trace(hs.count());
-		trace(hs);
-		trace(hs.toString());
-
-		trace("=============== PersistentArrayMAp ============");
-		// var hs:PersistentHashSet = PersistentHashSet.create(1, 2, 3);
-		var pam:PersistentArrayMap = PersistentArrayMap.create("a", "b", "c", "d", "e", hm);
-		trace(pam.count());
-		trace(pam);
-		trace(pam.toString());
-
-		trace(Numbers.equiv(10, null));
-		// trace(Util.classOf(pp2));
+		// trace(m.match("0x10112M"));
 	}
 }

@@ -32,7 +32,7 @@ class PersistentVector extends APersistentVector implements IObj implements IEdi
 		return new PersistentVector(items.length, 5, EMPTY_NODE, items);
 	}
 
-	static public function create(items:IReduceInit):PersistentVector {
+	static public function createFromReduceInit(items:IReduceInit):PersistentVector {
 		var ret:TransientVector = EMPTY.asTransient();
 		items.reduce2(TRANSIENT_VECTOR_CONJ, ret);
 		return ret.persistent();
@@ -62,12 +62,18 @@ class PersistentVector extends APersistentVector implements IObj implements IEdi
 		}
 	}
 
-	static public function createFromItems(...items:Any):PersistentVector {
+	static public function createFromIterator(items:Iterator<Any>):PersistentVector {
 		var ret:TransientVector = EMPTY.asTransient();
 		for (item in items)
 			ret = ret.conj(item);
 		return ret.persistent();
 	}
+
+
+	static public function createFromItems(...items:Any):PersistentVector {
+		return createFromIterator(items.iterator());
+	}
+
 
 	public function asTransient():TransientVector {
 		return TransientVector.createFromPersistentVector(this);

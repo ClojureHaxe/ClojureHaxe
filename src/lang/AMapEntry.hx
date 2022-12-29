@@ -22,9 +22,7 @@ abstract class AMapEntry extends APersistentVector implements IMapEntry {
 	}
 
 	private function asVector():IPersistentVector {
-		// TODO:
-		// return LazilyPersistentVector.createOwning(key(), val());
-		return null;
+		return LazilyPersistentVector.createOwning(key(), val());
 	}
 
 	public function assocN(i:Int, val:Any):IPersistentVector {
@@ -48,8 +46,7 @@ abstract class AMapEntry extends APersistentVector implements IMapEntry {
 	}
 
 	public function pop():IPersistentStack {
-		// return LazilyPersistentVector.createOwning(key());
-		return null;
+		return LazilyPersistentVector.createOwning(key());
 	}
 
 	public function setValue(value:Any):Any {

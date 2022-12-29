@@ -22,21 +22,38 @@ class RT {
 	static public final CLOJURE_NS:Namespace = Namespace.findOrCreate(Symbol.internNSname("clojure.core"));
 	static public final TAG_KEY:Keyword = Keyword.intern(null, "tag");
 
+	static public final DEFAULT_DATA_READERS:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("default-data-readers"), RT.map());
+	static public final SUPPRESS_READ:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*suppress-read*"), null).setDynamic();
+	static public final LINE_KEY:Keyword = Keyword.intern(null, "line");
+	static public final COLUMN_KEY:Keyword = Keyword.intern(null, "column");
+
 	static public function errPrint(s:String) {
-		trace(s);
+		// TODO;
+		// trace(s);
 	}
 
 	static public function map(...init:Any):IPersistentMap {
 		if (init == null || init.length == 0)
 			return PersistentArrayMap.EMPTY;
 		else if (init.length <= PersistentArrayMap.HASHTABLE_THRESHOLD)
-			return PersistentArrayMap.createWithCheck(init);
-		return PersistentHashMap.createWithCheck(init);
+			return PersistentArrayMap.createWithCheck(...init);
+		return PersistentHashMap.createWithCheck(...init);
+	}
+
+	static public function mapFromArray(init:Array<Any>):IPersistentMap {
+		if (init == null || init.length == 0)
+			return PersistentArrayMap.EMPTY;
+		else if (init.length <= PersistentArrayMap.HASHTABLE_THRESHOLD)
+			return PersistentArrayMap.createWithCheck(...init);
+		return PersistentHashMap.createWithCheck(...init);
 	}
 
 	static public final EMPTY_ARRAY:Array<Any> = new Array<Any>();
 
 	public static function get(coll:Any, key:Any, ?notFound = null):Any {
+		if (U.instanceof(coll, ILookup))
+			return cast(coll, ILookup).valAt(key);
+		// TODO: make all
 		return null;
 	}
 
@@ -66,6 +83,12 @@ class RT {
 		if (seq == null)
 			return null;
 		return seq.next();
+	}
+
+	static public function meta(x:Any):IPersistentMap {
+		if (U.instanceof(x, IMeta))
+			return cast(x, IMeta).meta();
+		return null;
 	}
 
 	static public function printString(x:Any):String {
@@ -300,6 +323,10 @@ class RT {
 		if (coll == null)
 			return null;
 		return cast(coll, IPersistentMap).without(key);
+	}
+
+	static public function suppressRead():Bool {
+		return booleanCast(SUPPRESS_READ.deref());
 	}
 
 	// List stuff ==========================================================================

@@ -1,6 +1,7 @@
 // Some functions that help interact with Haxe
 package lang;
 
+import lang.exceptions.IllegalArgumentException;
 import Type.ValueType;
 import haxe.ds.Vector;
 
@@ -92,6 +93,61 @@ class U {
 		}
 		return v;
 	}
+
+	static public function parseChar(s:String):Int {
+		var c:Int = s.charCodeAt(0);
+		// c >= '0' && c <=
+		if (c >= '0'.code && c <= '9'.code) {
+			return c - '0'.code;
+		}
+		if (c >= 'a'.code && c <= 'z'.code){
+			return c - 'a'.code + 10;
+		}
+		if (c >= 'A'.code && c <= 'Z'.code){
+			return c - 'A'.code + 10;
+		}
+		throw new IllegalArgumentException('Cannot parse char "$s" to Int');
+	}
+
+	static public function parseInt(s:String, radix:Int):Int {
+		var i:Int = s.length - 1;
+		var res:Int = 0;
+		var mul:Int = 1;
+		while (i >= 0) {
+			res += parseChar(s.charAt(i)) * mul;
+			mul *= radix;
+			i--;
+		}
+		return res;
+	}
+	/*static public function intToString(i:Int, radix:Int):String {
+		if (radix < 2 || radix > 36) {
+			radix = 10;
+		}
+		if (radix == 10) {
+			return  '$i';
+		}  else {
+			byte[] buf = new byte[33];
+			boolean negative = i < 0;
+			int charPos = 32;
+			if (!negative) {
+				i = -i;
+			}
+
+			while(i <= -radix) {
+				buf[charPos--] = (byte)digits[-(i % radix)];
+				i /= radix;
+			}
+
+			buf[charPos] = (byte)digits[-i];
+			if (negative) {
+				--charPos;
+				buf[charPos] = 45;
+			}
+
+			return StringLatin1.newString(buf, charPos, 33 - charPos);
+		}
+	}*/
 }
 
 // class EmptyArg {

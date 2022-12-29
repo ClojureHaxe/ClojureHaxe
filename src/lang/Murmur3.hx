@@ -1,9 +1,10 @@
 package lang;
 
-final class Murmur3 {
-	private static final seed = 0;
-	private static final C1 = 0xcc9e2d51;
-	private static final C2 = 0x1b873593;
+class Murmur3 {
+	// TODO: check overflow and maybe use Int64
+	private static inline final seed:Int = 0;
+	private static inline final C1:Int = 0xcc9e2d51;
+	private static inline final C2:Int = 0x1b873593;
 
 	public static function hashInt(input:Int):Int {
 		if (input == 0)
@@ -67,8 +68,8 @@ final class Murmur3 {
 	}
 
 	public static function hashOrdered<T>(xs:Iterable<T>):Int {
-		var n = 0;
-		var hash = 1;
+		var n:Int = 0;
+		var hash:Int = 1;
 
 		for (x in xs.iterator()) {
 			hash = 31 * hash + Util.hasheq(x);

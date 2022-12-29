@@ -1,9 +1,10 @@
 package lang;
 
-class Symbol extends AFn implements IObj implements Named implements IHashEq {
+class Symbol extends AFn implements IObj implements Named implements IHashEq implements IEqual {
 	// Comparable Serializable
 	public var ns:String;
 	public var name:String;
+
 	var _hasheq:Int = 0;
 	var _meta:IPersistentMap;
 
@@ -66,6 +67,8 @@ class Symbol extends AFn implements IObj implements Named implements IHashEq {
 
 	public function hasheq():Int {
 		if (_hasheq == 0) {
+			// lltrace(name, ns, Murmur3.hashUnencodedChars(ns));
+			// trace("hashed Symbol: ", Murmur3.hashUnencodedChars(name), Murmur3.hashUnencodedChars(ns));
 			_hasheq = Util.hashCombine(Murmur3.hashUnencodedChars(name), Murmur3.hashUnencodedChars(ns));
 		}
 		return _hasheq;

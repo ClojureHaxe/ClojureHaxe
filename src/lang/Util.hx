@@ -14,10 +14,13 @@ class Util {
 				return Numbers.equal(k1, k2);
 			else if (U.instanceof(k1, IPersistentCollection) || U.instanceof(k2, IPersistentCollection))
 				return pcequiv(k1, k2);
-			else
+			else if (U.instanceof(k1, IEqual)){
+				return cast(k1, IEqual).equals(k2);
+			} else if ((U.getClassName(k1) == U.getClassName(k2)) && k1 != k2){
 				return false;
-			// if (U.instanceof());
-			// return k1.equals(k2);
+			}
+			// TODO: return false
+			throw runtimeException('ERROR: cant equiv: $k1 (${U.typeName(k1)}) with $k2 (${U.typeName(k2)})');
 		}
 		return false;
 	}

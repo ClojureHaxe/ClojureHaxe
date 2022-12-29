@@ -30,6 +30,13 @@ class Ratio {
 	public function floatValue():Float {
 		return numerator / denominator;
 	}
+
+	static public function toNumber(n:Int, d:Int):Any {
+		if (n % d == 0) {
+			return Std.int(n / d);
+		}
+		return n / d;
+	}
 	/*
 		public int compareTo(Object o) {
 			Number other = (Number) o;
