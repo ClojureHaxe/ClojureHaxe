@@ -27,6 +27,8 @@ class RT {
 	static public final LINE_KEY:Keyword = Keyword.intern(null, "line");
 	static public final COLUMN_KEY:Keyword = Keyword.intern(null, "column");
 
+	static public final DEFAULT_COMPARATOR:Comparator = new DefaultComparator();
+
 	static public function errPrint(s:String) {
 		// TODO;
 		// trace(s);
@@ -67,13 +69,25 @@ class RT {
 			return new Cons(x, seq(coll));
 	}
 
-	static public function first(x:Any) {
+	static public function first(x:Any):Any {
 		if (U.instanceof(x, ISeq))
 			return (cast x).first();
 		var seq:ISeq = seq(x);
 		if (seq == null)
 			return null;
 		return seq.first();
+	}
+
+	static public function second(x:Any):Any {
+		return first(next(x));
+	}
+
+	static public function third(x:Any):Any {
+		return first(next(next(x)));
+	}
+
+	static public function fourth(x:Any):Any {
+		return first(next(next(next(x))));
 	}
 
 	static public function next(x:Any):ISeq {
@@ -380,5 +394,19 @@ class ChunkIteratorSeqLazySeqAFn extends AFn {
 		while (iter.hasNext() && n < RT.CHUNK_SIZE)
 			arr[n++] = iter.next();
 		return new ChunkedCons(new ArrayChunk(arr, 0, n), RT.chunkIteratorSeq(iter));
+	}
+}
+
+class DefaultComparator implements Comparator {
+	public function new() {}
+
+	public function compare(o1:Any, o2:Any):Int {
+		return Util.compare(o1, o2);
+	}
+
+	private function readResolve():Any {
+		// ensures that we aren't hanging onto a new default comparator for every
+		// sorted set, etc., we deserialize
+		return RT.DEFAULT_COMPARATOR;
 	}
 }

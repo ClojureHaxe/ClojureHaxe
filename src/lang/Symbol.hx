@@ -1,7 +1,7 @@
 package lang;
 
-class Symbol extends AFn implements IObj implements Named implements IHashEq implements IEqual {
-	// Comparable Serializable
+class Symbol extends AFn implements IObj implements Named implements IHashEq implements IEqual //  Serializable
+implements Comparable {
 	public var ns:String;
 	public var name:String;
 

@@ -14,9 +14,9 @@ class Util {
 				return Numbers.equal(k1, k2);
 			else if (U.instanceof(k1, IPersistentCollection) || U.instanceof(k2, IPersistentCollection))
 				return pcequiv(k1, k2);
-			else if (U.instanceof(k1, IEqual)){
+			else if (U.instanceof(k1, IEqual)) {
 				return cast(k1, IEqual).equals(k2);
-			} else if ((U.getClassName(k1) == U.getClassName(k2)) && k1 != k2){
+			} else if ((U.getClassName(k1) == U.getClassName(k2)) && k1 != k2) {
 				return false;
 			}
 			// TODO: return false
@@ -66,6 +66,35 @@ class Util {
 		} catch (e) {
 			return null;
 		}
+	}
+
+	static public function compare(k1:Any, k2:Any):Int {
+		// TODO: compare fix?
+		if (k1 == k2)
+			return 0;
+		if (k1 != null) {
+			if (k2 == null)
+				return 1;
+			if (U.isNumber(k1) && U.isNumber(k2))
+				if ((cast k1) > (cast k2))
+					return 1;
+				else
+					return -1;
+			if (U.instanceof(k1, String) && U.instanceof(k2, String)) {
+				if (cast(k1, String) > cast(k2, String))
+					return 1;
+				else
+					return -1;
+			}
+			// return Numbers.compare((Number) k1, (Number) k2);
+			// return ((Comparable) k1).compareTo(k2);
+			// throw runtimeException("Cant compare " + k1 + " and " + k2);
+			if (U.instanceof(k1, Comparable)) {
+				return cast(k1, Comparable).compareTo(k2);
+			}
+		}
+		/*return -1;*/
+		return Reflect.compare(k1, k2);
 	}
 
 	// TODO: write String wrapper with _hash field hashed

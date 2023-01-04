@@ -1,11 +1,13 @@
 package lang;
 
+import haxe.Constraints.IMap;
 import lang.exceptions.IllegalArgumentException;
 import lang.exceptions.UnsupportedOperationException;
 
-abstract class APersistentMap extends AFn implements IPersistentMap // implements Map, Iterable, Serializable,
-// implements MapEquivalence implements IHashEq
-{
+abstract class APersistentMap extends AFn implements IPersistentMap // implements IMap<K, V>
+// implements Map, Iterable, Serializable,
+// TODO: implements IMap
+implements MapEquivalence implements IHashEq {
 	var _hash:Int;
 	var _hasheq:Int;
 
@@ -49,7 +51,9 @@ abstract class APersistentMap extends AFn implements IPersistentMap // implement
 			return true;
 		if (!(U.instanceof(obj, IPersistentMap)))
 			return false;
-		var m:IPersistentMap = cast obj;
+		// var m:IPersistentMap = cast obj;
+		// TODO: Need some type that has .get()
+		var m:APersistentMap = cast obj;
 
 		if (m.count() != m1.count())
 			return false;
@@ -59,9 +63,9 @@ abstract class APersistentMap extends AFn implements IPersistentMap // implement
 			var e:Map.Entry = cast s.first();
 			var found:Bool = m.containsKey(e.getKey());
 
-            // TODO:!!!
-			// if (!found || !Util.equals(e.getValue(), m.get(e.getKey())))
-			// 	return false;
+			// TODO:!!!
+			if (!found || !Util.equals(e.getValue(), m.get(e.getKey())))
+				return false;
 
 			s = s.next();
 		}
@@ -72,7 +76,8 @@ abstract class APersistentMap extends AFn implements IPersistentMap // implement
 	public function equiv(obj:Any):Bool {
 		if (!(U.instanceof(obj, IPersistentMap)))
 			return false;
-		var m:IPersistentMap = cast obj;
+		// TODO: Need some type that has .get()
+		var m:APersistentMap = cast obj;
 
 		if (m.count() != count())
 			return false;
@@ -82,9 +87,9 @@ abstract class APersistentMap extends AFn implements IPersistentMap // implement
 			var e:Map.Entry = cast s.first();
 			var found:Bool = m.containsKey(e.getKey());
 
-            // TODO:!!!
-			// if (!found || !Util.equiv(e.getValue(), m.get(e.getKey())))
-			// 	return false;
+			// TODO:!!!
+			if (!found || !Util.equiv(e.getValue(), m.get(e.getKey())))
+				return false;
 
 			s = s.next();
 		}
@@ -127,98 +132,83 @@ abstract class APersistentMap extends AFn implements IPersistentMap // implement
 
 	public static final MAKE_VAL:IFn = new MakeValFN();
 
+	override public function invoke1(arg1:Any) {
+		return valAt(arg1);
+	}
 
+	override public function invoke2(arg1:Any, notFound:Any) {
+		return valAt(arg1, notFound);
+	}
 
-   override public function invoke1(arg1:Any) {
-        return valAt(arg1);
-    }
+	// java.util.Map implementation
 
-    override public function invoke2(arg1:Any, notFound:Any) {
-        return valAt(arg1, notFound);
-    }
+	public function clear() {
+		throw new UnsupportedOperationException();
+	}
 
-// java.util.Map implementation
+	/*public function containsValue( value:Any):Bool{
+		// TODO://
+		// return values().contains(value);
+		return null;
+	}*/
+	// TODO:
+	// public Set entrySet() {
+	//     return new AbstractSet() {
+	//         public Iterator iterator() {
+	//             return APersistentMap.this.iterator();
+	//         }
+	//         public int size() {
+	//             return count();
+	//         }
+	//         public int hashCode() {
+	//             return APersistentMap.this.hashCode();
+	//         }
+	//         public boolean contains(Object o) {
+	//             if (o instanceof Entry) {
+	//                 Entry e = (Entry) o;
+	//                 Entry found = entryAt(e.getKey());
+	//                 if (found != null && Util.equals(found.getValue(), e.getValue()))
+	//                     return true;
+	//             }
+	//             return false;
+	//         }
+	//     };
+	// }
 
-    public function clear() {
-        throw new UnsupportedOperationException();
-    }
+	public function get(key:Any):Any {
+		return valAt(key);
+	}
 
-    /*public function containsValue( value:Any):Bool{
-        // TODO://
-        // return values().contains(value);
-        return null;
-    }*/
+	public function isEmpty():Bool {
+		return count() == 0;
+	}
 
-    // TODO:
-    // public Set entrySet() {
-    //     return new AbstractSet() {
-
-    //         public Iterator iterator() {
-    //             return APersistentMap.this.iterator();
-    //         }
-
-    //         public int size() {
-    //             return count();
-    //         }
-
-    //         public int hashCode() {
-    //             return APersistentMap.this.hashCode();
-    //         }
-
-    //         public boolean contains(Object o) {
-    //             if (o instanceof Entry) {
-    //                 Entry e = (Entry) o;
-    //                 Entry found = entryAt(e.getKey());
-    //                 if (found != null && Util.equals(found.getValue(), e.getValue()))
-    //                     return true;
-    //             }
-    //             return false;
-    //         }
-    //     };
-    // }
-
-    public function get(key:Any):Any {
-        return valAt(key);
-    }
-
-    public function isEmpty():Bool {
-        return count() == 0;
-    }
-
-    // TODO:
-    // public Set keySet() {
-    //     return new AbstractSet() {
-
-    //         public Iterator iterator() {
-    //             final Iterator mi = APersistentMap.this.iterator();
-
-    //             return new Iterator() {
-
-
-    //                 public boolean hasNext() {
-    //                     return mi.hasNext();
-    //                 }
-
-    //                 public Object next() {
-    //                     Entry e = (Entry) mi.next();
-    //                     return e.getKey();
-    //                 }
-
-    //                 public void remove() {
-    //                     throw new UnsupportedOperationException();
-    //                 }
-    //             };
-    //         }
-
-    //         public int size() {
-    //             return count();
-    //         }
-
-    //         public boolean contains(Object o) {
-    //             return APersistentMap.this.containsKey(o);
-    //         }
-    //     };
-    // }
+	// TODO:
+	// public Set keySet() {
+	//     return new AbstractSet() {
+	//         public Iterator iterator() {
+	//             final Iterator mi = APersistentMap.this.iterator();
+	//             return new Iterator() {
+	//                 public boolean hasNext() {
+	//                     return mi.hasNext();
+	//                 }
+	//                 public Object next() {
+	//                     Entry e = (Entry) mi.next();
+	//                     return e.getKey();
+	//                 }
+	//                 public void remove() {
+	//                     throw new UnsupportedOperationException();
+	//                 }
+	//             };
+	//         }
+	//         public int size() {
+	//             return count();
+	//         }
+	//         public boolean contains(Object o) {
+	//             return APersistentMap.this.containsKey(o);
+	//         }
+	//     };
+	// }
 }
 
 class MakeEntryFN extends AFn {
@@ -275,7 +265,7 @@ class KeySeq extends ASeq {
 		return cast(_seq.first(), Map.Entry).getKey();
 	}
 
-    // TODO: fix return type IPersistentMap
+	// TODO: fix return type IPersistentMap
 	public function next():ISeq {
 		return cast create(_seq.next());
 	}

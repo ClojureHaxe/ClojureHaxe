@@ -2,8 +2,8 @@ package lang;
 
 import lang.exceptions.ArityException;
 
-class Keyword extends AFn implements IFn implements Named implements IHashEq implements IEqual {
-	// Serializable Comparable
+class Keyword extends AFn implements IFn implements Named implements IHashEq implements IEqual // Serializable
+implements Comparable {
 	public var sym:Symbol;
 
 	public var _str:String;
