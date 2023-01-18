@@ -1,5 +1,7 @@
 package lang;
 
+import haxe.ds.Vector;
+
 class ArraySeq extends ASeq implements IndexedSeq implements IReduce {
 	public var array:Array<Any>;
 	public var i:Int;
@@ -119,9 +121,10 @@ class ArraySeq extends ASeq implements IndexedSeq implements IReduce {
 		return -1;
 	}
 
-	public function toArray():Array<Any> {
+	override public function toArray():Vector<Any> {
 		var sz:Int = this.array.length - this.i;
 		// var ret:Array<Any> = new Array<Any>();
-		return this.array.slice(i, sz);
+		// return  this.array.slice(i, sz);
+		return Vector.fromArrayCopy(this.array.slice(i, sz));
 	}
 }

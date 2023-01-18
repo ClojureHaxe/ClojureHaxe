@@ -1,11 +1,13 @@
 package lang;
 
+import lang.exceptions.UnsupportedOperationException;
 import haxe.Exception;
+import haxe.ds.Vector;
 
 abstract class ASeq extends Obj implements ISeq implements Sequential // TODO:
 // implements List
 // implements Serializable
-implements IHashEq {
+implements IHashEq implements Collection {
 	var _hash:Int;
 	var _hasheq:Int;
 
@@ -26,9 +28,7 @@ implements IHashEq {
 		)
 			return false;
 
-		if ( // Std.downcast(this, Counted) != null &&
-			// Std.downcast(obj, Counted) != null &&
-			U.instanceof(this, Counted) && U.instanceof(obj, Counted) && cast(this, Counted).count() != cast(obj, Counted).count())
+		if (U.instanceof(this, Counted) && U.instanceof(obj, Counted) && cast(this, Counted).count() != cast(obj, Counted).count())
 			return false;
 
 		var ms:ISeq = RT.seq(obj);
@@ -77,7 +77,65 @@ implements IHashEq {
 		return s;
 	}
 
+	// java.util.Collection implementation
+	public function toArray():Vector<Any> {
+		return RT.seqToArray(seq());
+	}
+
+	public function add(o:Any):Bool {
+		throw new UnsupportedOperationException();
+	}
+
+	public function remove(o:Any):Bool {
+		throw new UnsupportedOperationException();
+	}
+
+	public function addAll(c:Collection):Bool {
+		throw new UnsupportedOperationException();
+	}
+
+	public function clear() {
+		throw new UnsupportedOperationException();
+	}
+
+	public function retainAll(c:Collection):Bool {
+		throw new UnsupportedOperationException();
+	}
+
+	public function removeAll(c:Collection):Bool {
+		throw new UnsupportedOperationException();
+	}
+
+	public function containsAll(c:Collection):Bool {
+		for (o in U.getIterator(c)) {
+			if (!contains(o))
+				return false;
+		}
+		return true;
+	}
+
+	/*public function toArray(a:Vector<Any>):Vector<Any> {
+		return RT.seqToPassedArray(seq(), a);
+	}*/
+	public function size():Int {
+		return count();
+	}
+
+	public function isEmpty():Bool {
+		return seq() == null;
+	}
+
+	public function contains(o:Any):Bool {
+		var s:ISeq = seq();
+		while (s != null) {
+			if (Util.equiv(s.first(), o))
+				return true;
+			s = s.next();
+		}
+		return false;
+	}
+
 	public function iterator():Iterator<Any> {
-        return new SeqIterator(this);
-    }
+		return new SeqIterator(this);
+	}
 }

@@ -2,6 +2,7 @@ package lang;
 
 import lang.exceptions.UnsupportedOperationException;
 import haxe.ds.List;
+import haxe.ds.Vector;
 
 class PersistentList extends ASeq implements IPersistentList implements IReduce // TODO: implements List
 implements Counted {
@@ -150,7 +151,7 @@ class Primordial extends RestFn {
 }
 
 class EmptyList extends Obj implements IPersistentList // implements List
-implements ISeq implements Counted implements IHashEq implements IEqual {
+implements ISeq implements Counted implements IHashEq implements IEqual implements Collection {
 	static final _hasheq:Int = Murmur3.hashOrdered(new Array<Any>());
 
 	public function hashCode():Int {
@@ -236,7 +237,7 @@ implements ISeq implements Counted implements IHashEq implements IEqual {
 	// public function iterator():Iterator<Any>{
 	// }
 
-	public function toArray():Array<Any> {
+	public function toArray():Vector<Any> {
 		return RT.EMPTY_ARRAY;
 	}
 

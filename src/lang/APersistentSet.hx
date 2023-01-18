@@ -110,30 +110,30 @@ abstract class APersistentSet extends AFn implements IPersistentSet implements I
 		throw new UnsupportedOperationException();
 	}
 
-	/*public function addAll(Collection c):Bool {
-			throw new UnsupportedOperationException();
-		}
+	public function addAll(c:Collection):Bool {
+		throw new UnsupportedOperationException();
+	}
 
-		public function clear() {
-			throw new UnsupportedOperationException();
-		}
+	public function clear() {
+		throw new UnsupportedOperationException();
+	}
 
-		public boolean retainAll(Collection c) {
-			throw new UnsupportedOperationException();
-		}
+	public function retainAll(c:Collection) {
+		throw new UnsupportedOperationException();
+	}
 
-		public boolean removeAll(Collection c) {
-			throw new UnsupportedOperationException();
+	public function removeAll(c:Collection):Bool {
+		throw new UnsupportedOperationException();
+	}
+
+	public function containsAll(c:Collection) {
+		for (o in U.getIterator(c)) {
+			if (!contains(o))
+				return false;
 		}
-		  
-		public boolean containsAll(Collection c) {
-			for (Object o : c) {
-				if (!contains(o))
-					return false;
-			}
-			return true;
-		}
-	 */
+		return true;
+	}
+
 	/*
 		public toArray(a:Vector<Any>):Vector<Any> {
 			return RT.seqToPassedArray(seq(), a);

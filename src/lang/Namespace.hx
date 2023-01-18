@@ -212,6 +212,10 @@ class Namespace extends AReference {
 		return namespaces.get(name);
 	}
 
+	public function getMapping(name:Symbol):Any {
+		return mappings.valAt(name);
+	}
+
 	public function findInternedVar(symbol:Symbol):Var {
 		var o:Any = mappings.valAt(symbol);
 		if (o != null && U.instanceof(o, Var) && cast(o, Var).ns == this)

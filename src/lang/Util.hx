@@ -176,6 +176,10 @@ class Util {
 	static public function runtimeException(s:String, ?e:Exception):RuntimeException {
 		return new RuntimeException(s, e);
 	}
+
+	static public function sneakyThrow(e:Exception):Exception {
+		return e;
+	}
 }
 
 // EquivPred =================================================================

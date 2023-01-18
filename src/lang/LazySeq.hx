@@ -1,7 +1,10 @@
 package lang;
 
+import haxe.ds.Vector;
+import lang.exceptions.UnsupportedOperationException;
+
 final class LazySeq extends Obj implements ISeq implements Sequential implements IPending implements IHashEq // implements List
-{
+implements Collection {
 	// private static final long serialVersionUID = 7700080124382322592L;
 	private var fn:IFn;
 	private var sv:Any;
@@ -118,67 +121,63 @@ final class LazySeq extends Obj implements ISeq implements Sequential implements
 
 	// java.util.Collection implementation
 
-	/*
-		public Object[] toArray() {
-			return RT.seqToArray(seq());
-		}
+	public function toArray():Vector<Any> {
+		return RT.seqToArray(seq());
+	}
 
-		public boolean add(Object o) {
-			throw new UnsupportedOperationException();
-		}
+	public function add(o:Any):Bool {
+		throw new UnsupportedOperationException();
+	}
 
-		public boolean remove(Object o) {
-			throw new UnsupportedOperationException();
-		}
+	public function remove(o:Any):Bool {
+		throw new UnsupportedOperationException();
+	}
 
-		public boolean addAll(Collection c) {
-			throw new UnsupportedOperationException();
-		}
+	public function addAll(c:Collection):Bool {
+		throw new UnsupportedOperationException();
+	}
 
-		public void clear() {
-			throw new UnsupportedOperationException();
-		}
+	public function clear() {
+		throw new UnsupportedOperationException();
+	}
 
-		public boolean retainAll(Collection c) {
-			throw new UnsupportedOperationException();
-		}
+	public function retainAll(c:Collection):Bool {
+		throw new UnsupportedOperationException();
+	}
 
-		public boolean removeAll(Collection c) {
-			throw new UnsupportedOperationException();
-		}
+	public function removeAll(c:Collection):Bool {
+		throw new UnsupportedOperationException();
+	}
 
-		public boolean containsAll(Collection c) {
-			for (Object o : c) {
-				if (!contains(o))
-					return false;
-			}
-			return true;
+	public function containsAll(c:Collection):Bool {
+		for (o in U.getIterator(c)) {
+			if (!contains(o))
+				return false;
 		}
+		return true;
+	}
 
-		public Object[] toArray(Object[] a) {
-			return RT.seqToPassedArray(seq(), a);
-		}
+	/*public function toArray(a:Vector<Any>):Vector<Any> {
+		return RT.seqToPassedArray(seq(), a);
+	}*/
+	public function size():Int {
+		return count();
+	}
 
-		public int size() {
-			return count();
-		}
+	public function isEmpty():Bool {
+		return seq() == null;
+	}
 
-		public boolean isEmpty() {
-			return seq() == null;
+	public function contains(o:Any):Bool {
+		var s:ISeq = seq();
+		while (s != null) {
+			if (Util.equiv(s.first(), o))
+				return true;
+			s = s.next();
 		}
+		return false;
+	}
 
-		public boolean contains(Object o) {
-			for (ISeq s = seq(); s != null; s = s.next()) {
-				if (Util.equiv(s.first(), o))
-					return true;
-			}
-			return false;
-		}
-
-		public Iterator iterator() {
-			return new SeqIterator(this);
-		}
-	 */
 	public function iterator():Iterator<Any> {
 		return new SeqIterator(this);
 	}

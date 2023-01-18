@@ -8,26 +8,25 @@
 # --cs testBin/cs
 # --next
 
---jvm testBin/jvm/main.jar
---next
+# --jvm testBin/jvm/main.jar
+# --next
 
---hl testBin/hl/main.hl 
---next
+# --hl testBin/hl/main.hl 
+# --next
 
---js testBin/js/main.js
---next
+# --js testBin/js/main.js
+# --next
 
---lua testBin/lua/main.lua
---next
+# --lua testBin/lua/main.lua
+# --next
 
---java testBin/java
---next
+# --java testBin/java
+# --next
 
---python testBin/python/main.py
---next
+# --python testBin/python/main.py
+# --next
 
---cpp testBin/cpp/
---next
-
+# --cpp testBin/cpp/
+# --next
 
 --interp

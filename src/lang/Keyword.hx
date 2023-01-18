@@ -19,6 +19,10 @@ implements Comparable {
 		return new Keyword(Symbol.create(ns, name));
 	}
 
+	public static function create1(nsname:String):Keyword {
+		return new Keyword(Symbol.createNSname(nsname));
+	}
+
 	public static function createNSname(nsname:String):Keyword {
 		return new Keyword(Symbol.createNSname(nsname));
 	}
@@ -31,6 +35,9 @@ implements Comparable {
 		return new Keyword(Symbol.create(ns, name));
 	}
 
+	public static function intern1(nsname:String):Keyword {
+		return new Keyword(Symbol.createNSname(nsname));
+	}
 	public static function internNSname(nsname:String):Keyword {
 		return new Keyword(Symbol.createNSname(nsname));
 	}

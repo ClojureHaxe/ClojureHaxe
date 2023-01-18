@@ -16,3 +16,5 @@
 * `Character.hx` - There are not Characters in Haxe
 
 * `Comparable.hx`, `Comparator.hx` - for sorting
+
+* `Collection.hx` - For compatibility
