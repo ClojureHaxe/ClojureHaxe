@@ -267,7 +267,7 @@ class Seq extends ASeq implements IndexedSeq implements IReduce {
 		return v.count() - i;
 	}
 
-	override public function withMeta(meta:IPersistentMap):APersistentVector.Seq {
+	public function withMeta(meta:IPersistentMap):APersistentVector.Seq {
 		if (this.meta() == meta)
 			return this;
 		return new APersistentVector.Seq(v, i, meta);
@@ -329,7 +329,7 @@ class RSeq extends ASeq implements IndexedSeq implements Counted {
 		return i + 1;
 	}
 
-	override public function withMeta(meta:IPersistentMap):APersistentVector.RSeq {
+	public function withMeta(meta:IPersistentMap):APersistentVector.RSeq {
 		if (this.meta() == meta)
 			return this;
 		return new APersistentVector.RSeq(v, i, meta);

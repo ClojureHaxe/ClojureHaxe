@@ -28,7 +28,7 @@ final class Cons extends ASeq {
 		return 1 + RT.count(_more);
 	}
 
-	override  public function withMeta(meta:IPersistentMap):Cons {
+	public function withMeta(meta:IPersistentMap):Cons {
 		if (super.meta() == meta)
 			return this;
 		return new Cons(_first, _more, meta);

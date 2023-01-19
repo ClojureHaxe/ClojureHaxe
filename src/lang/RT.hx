@@ -25,13 +25,19 @@ class RT {
 		return Keyword.intern(null, "unknown");
 	}
 
-	static public final REQUIRE_LOCK:Any = new Obj();
+	// TODO: fix object for that
+	static public final REQUIRE_LOCK:Any = Symbol.intern1("REQUIRE_LOCK");
 	static public final CLOJURE_NS:Namespace = Namespace.findOrCreate(Symbol.internNSname("clojure.core"));
 
-	static public final OUT:Var = null; // 	Var.intern(CLOJURE_NS, Symbol.intern("*out*"), new OutputStreamWriter(System.out)).setDynamic();
-	static public final IN:Var = null; // Var.intern(CLOJURE_NS, Symbol.intern("*in*"),	new LineNumberingPushbackReader(new InputStreamReader(System.in))).setDynamic();
-	static public final ERR:Var = null; // Var.intern(CLOJURE_NS, Symbol.intern("*err*"), new PrintWriter(new OutputStreamWriter(System.err), true)).setDynamic();
-
+	// TODO: reader/wirter instead of stdin, stderr, stdout
+	// static public final OUT:Var = Var.intern(CLOJURE_NS, Symbol.intern("*out*"), new OutputStreamWriter(System.out)).setDynamic();
+	// static public final IN:Var = Var.intern(CLOJURE_NS, Symbol.intern("*in*"), new LineNumberingPushbackReader(new InputStreamReader(System.in))).setDynamic();
+	// static public final ERR:Var = Var.intern(CLOJURE_NS, Symbol.intern("*err*"), new PrintWriter(new OutputStreamWriter(System.err), true)).setDynamic();
+	#if !js
+	static public final OUT:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*out*"), Sys.stdout()).setDynamic();
+	static public final IN:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*in*"), Sys.stdin()).setDynamic();
+	static public final ERR:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*err*"), Sys.stderr()).setDynamic();
+	#end
 	static public final TAG_KEY:Keyword = Keyword.intern(null, "tag");
 	static final CONST_KEY:Keyword = Keyword.intern(null, "const");
 	static public final AGENT:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*agent*"), null).setDynamic();
@@ -114,10 +120,12 @@ class RT {
 	public static var instrumentMacros:Bool = false; // !Boolean.getBoolean("clojure.spec.skip-macros");
 	@:volatile static var CHECK_SPECS:Bool = false;
 
-	public function staticInit() {
+	public static function staticInit() {
 		var arglistskw:Keyword = Keyword.intern(null, "arglists");
 		var namesym:Symbol = Symbol.internNSname("name");
+		#if !js
 		OUT.setTag(Symbol.internNSname("java.io.Writer"));
+		#end
 		CURRENT_NS.setTag(Symbol.internNSname("clojure.lang.Namespace"));
 		AGENT.setMeta(map(DOC_KEY, "The agent currently running an action on this thread, else nil"));
 		AGENT.setTag(Symbol.internNSname("clojure.lang.Agent"));
@@ -397,7 +405,7 @@ class RT {
 
 	public static function get(coll:Any, key:Any, ?notFound = null):Any {
 		if (U.instanceof(coll, ILookup))
-			return cast(coll, ILookup).valAt(key);
+			return cast(coll, ILookup).valAt(key, notFound);
 		return getFrom(coll, key, notFound);
 	}
 

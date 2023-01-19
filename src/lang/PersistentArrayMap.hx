@@ -382,7 +382,7 @@ class PersistentArraySeq extends ASeq implements Counted implements IReduce impl
 		}
 	}
 
-	override public function withMeta(meta:IPersistentMap):Obj {
+	public function withMeta(meta:IPersistentMap):Obj {
 		if (super.meta() == meta)
 			return this;
 		return new PersistentArraySeq(array, i, meta);

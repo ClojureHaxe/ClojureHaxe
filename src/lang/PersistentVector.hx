@@ -69,11 +69,9 @@ class PersistentVector extends APersistentVector implements IObj implements IEdi
 		return ret.persistent();
 	}
 
-
 	static public function createFromItems(...items:Any):PersistentVector {
 		return createFromIterator(items.iterator());
 	}
-
 
 	public function asTransient():TransientVector {
 		return TransientVector.createFromPersistentVector(this);
@@ -375,7 +373,7 @@ class ChunkedSeq extends ASeq implements IChunkedSeq implements Counted implemen
 		return s;
 	}
 
-	override public function withMeta(meta:IPersistentMap):Obj {
+	public function withMeta(meta:IPersistentMap):Obj {
 		if (meta == this._meta)
 			return this;
 		return new ChunkedSeq(vec, node, i, offset, meta);

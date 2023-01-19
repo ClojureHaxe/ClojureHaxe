@@ -5,7 +5,7 @@ class ReaderConditional implements ILookup {
 	public static final SPLICING_KW:Keyword = Keyword.intern1("splicing?");
 
 	public var form:Any;
-	public var splicing:Bool;
+	public var splicing:Bool = false;
 
 	public static function create(form:Any, splicing:Bool):ReaderConditional {
 		return new ReaderConditional(form, splicing);
@@ -35,7 +35,8 @@ class ReaderConditional implements ILookup {
 		var that:ReaderConditional = cast o;
 		if (form != null ? !Util.equals(form, that.form) : that.form != null)
 			return false;
-		if (splicing != null ? !Util.equals(splicing, that.splicing) : that.splicing != null)
+		// if (splicing != null ? !Util.equals(splicing, that.splicing) : that.splicing != null)
+		if (!Util.equals(splicing, that.splicing))
 			return false;
 		return true;
 	}

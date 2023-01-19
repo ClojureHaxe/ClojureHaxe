@@ -11,7 +11,7 @@ class ChunkedCons extends ASeq implements IChunkedSeq {
 		this._more = more;
 	}
 
-	override public function withMeta(meta:IPersistentMap):Obj {
+	public function withMeta(meta:IPersistentMap):Obj {
 		if (meta != _meta)
 			return new ChunkedCons(chunk, _more, meta);
 		return this;

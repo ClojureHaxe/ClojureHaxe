@@ -687,7 +687,7 @@ class ArrayNodeSeq extends ASeq {
 		this.s = s;
 	}
 
-	override public function withMeta(meta:IPersistentMap):Obj {
+	public function withMeta(meta:IPersistentMap):Obj {
 		if (super.meta() == meta)
 			return this;
 		return new ArrayNodeSeq(meta, nodes, i, s);
@@ -1250,7 +1250,7 @@ class NodeSeq extends ASeq {
 		this.s = s;
 	}
 
-	override public function withMeta(meta:IPersistentMap):Obj {
+	public function withMeta(meta:IPersistentMap):Obj {
 		if (super.meta() == meta)
 			return this;
 		return new NodeSeq(meta, array, i, s);

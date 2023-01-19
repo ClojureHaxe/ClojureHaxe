@@ -7,7 +7,6 @@ class AReference extends AFn implements IReference {
 		_meta = meta;
 	}
 
-
 	/*@:synchronized*/
 	public function meta():IPersistentMap {
 		return _meta;

@@ -2,7 +2,7 @@ package lang;
 
 import haxe.Exception;
 
-class Obj implements IObj {
+abstract class Obj implements IObj {
 	var _meta:IPersistentMap;
 
 	public function new(?meta:IPersistentMap) {
@@ -13,7 +13,5 @@ class Obj implements IObj {
 		return _meta;
 	}
 
-	public function withMeta(meta:IPersistentMap):Obj{
-		throw new Exception("Obj.meta() implemented in subclasses.");
-	}
+	// abstract public function withMeta(meta:IPersistentMap):Obj;
 }

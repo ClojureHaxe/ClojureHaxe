@@ -16,7 +16,7 @@ class StringSeq extends ASeq implements IndexedSeq implements IDrop implements I
 		this.i = i;
 	}
 
-	override public function withMeta(meta:IPersistentMap):Obj {
+	public function withMeta(meta:IPersistentMap):Obj {
 		if (meta == super.meta())
 			return this;
 		return new StringSeq(meta, s, i);

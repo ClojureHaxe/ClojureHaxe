@@ -42,13 +42,17 @@ implements Comparable {
 		return new Symbol(ns, name);
 	}
 
-	public static function internNSname(nsname:String):Symbol {
+	public static function intern1(nsname:String):Symbol {
 		var i = nsname.indexOf("/");
 		if (i == -1 || nsname == "/") {
 			return new Symbol(null, nsname);
 		} else {
 			return new Symbol(nsname.substr(0, i), nsname.substr(i + 1));
 		}
+	}
+
+	public static function internNSname(nsname:String):Symbol {
+		return intern1(nsname);
 	}
 
 	public function equals(o:Any):Bool {

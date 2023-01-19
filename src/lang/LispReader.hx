@@ -33,39 +33,39 @@ class LispReader {
 
 	static final macros:Vector<IFn> = {
 		var m = new Vector<IFn>(256);
-		m['"'.code] = new LispReader.StringReader();
-		m[';'.code] = new LispReader.CommentReader();
-		m['\''.code] = new LispReader.WrappingReader(QUOTE);
-		m['@'.code] = new LispReader.WrappingReader(DEREF); // new DerefReader();
-		m['^'.code] = new LispReader.MetaReader();
-		m['`'.code] = new LispReader.SyntaxQuoteReader();
-		m['~'.code] = new LispReader.UnquoteReader();
-		m['('.code] = new LispReader.ListReader();
-		m[')'.code] = new LispReader.UnmatchedDelimiterReader();
-		m['['.code] = new LispReader.VectorReader();
-		m[']'.code] = new LispReader.UnmatchedDelimiterReader();
-		m['{'.code] = new LispReader.MapReader();
-		m['}'.code] = new LispReader.UnmatchedDelimiterReader();
-		m['\\'.code] = new LispReader.CharacterReader();
-		m['%'.code] = new LispReader.ArgReader();
-		m['#'.code] = new LispReader.DispatchReader();
+		m['"'.code] = new LispReader.StringReaderLR();
+		m[';'.code] = new LispReader.CommentReaderLR();
+		m['\''.code] = new LispReader.WrappingReaderLR(QUOTE);
+		m['@'.code] = new LispReader.WrappingReaderLR(DEREF); // new DerefReader();
+		m['^'.code] = new LispReader.MetaReaderLR();
+		m['`'.code] = new LispReader.SyntaxQuoteReaderLR();
+		m['~'.code] = new LispReader.UnquoteReaderLR();
+		m['('.code] = new LispReader.ListReaderLR();
+		m[')'.code] = new LispReader.UnmatchedDelimiterReaderLR();
+		m['['.code] = new LispReader.VectorReaderLR();
+		m[']'.code] = new LispReader.UnmatchedDelimiterReaderLR();
+		m['{'.code] = new LispReader.MapReaderLR();
+		m['}'.code] = new LispReader.UnmatchedDelimiterReaderLR();
+		m['\\'.code] = new LispReader.CharacterReaderLR();
+		m['%'.code] = new LispReader.ArgReaderLR();
+		m['#'.code] = new LispReader.DispatchReaderLR();
 		m;
 	}
 
 	static public final dispatchMacros:Vector<IFn> = {
 		var dispatch:Vector<IFn> = new Vector<IFn>(256);
-		dispatch['^'.code] = new LispReader.MetaReader();
-		dispatch['#'.code] = new LispReader.SymbolicValueReader();
-		dispatch['\''.code] = new LispReader.VarReader();
-		dispatch['"'.code] = new LispReader.RegexReader();
-		dispatch['('.code] = new LispReader.FnReader();
-		dispatch['{'.code] = new LispReader.SetReader();
-		dispatch['='.code] = new LispReader.EvalReader();
-		dispatch['!'.code] = new LispReader.CommentReader();
-		dispatch['<'.code] = new LispReader.UnreadableReader();
-		dispatch['_'.code] = new LispReader.DiscardReader();
-		dispatch['?'.code] = new LispReader.ConditionalReader();
-		dispatch[':'.code] = new LispReader.NamespaceMapReader();
+		dispatch['^'.code] = new LispReader.MetaReaderLR();
+		dispatch['#'.code] = new LispReader.SymbolicValueReaderLR();
+		dispatch['\''.code] = new LispReader.VarReaderLR();
+		dispatch['"'.code] = new LispReader.RegexReaderLR();
+		dispatch['('.code] = new LispReader.FnReaderLR();
+		dispatch['{'.code] = new LispReader.SetReaderLR();
+		dispatch['='.code] = new LispReader.EvalReaderLR();
+		dispatch['!'.code] = new LispReader.CommentReaderLR();
+		dispatch['<'.code] = new LispReader.UnreadableReaderLR();
+		dispatch['_'.code] = new LispReader.DiscardReaderLR();
+		dispatch['?'.code] = new LispReader.ConditionalReaderLR();
+		dispatch[':'.code] = new LispReader.NamespaceMapReaderLR();
 		dispatch;
 	}
 
@@ -78,7 +78,7 @@ class LispReader {
 	// sorted-map num->gensymbol
 	static public final ARG_ENV:Var = Var.create1(null).setDynamic();
 
-	static public final ctorReader:IFn = new LispReader.CtorReader();
+	static public final ctorReader:IFn = new LispReader.CtorReaderLR();
 	// Dynamic var set to true in a read-cond context
 	static public final READ_COND_ENV:Var = Var.create1(null).setDynamic();
 
@@ -91,7 +91,7 @@ class LispReader {
 			try {
 				r.unread();
 			} catch (e) {
-				throw Util.runtimeException("ERROR EdnReader unread", e);
+				throw Util.runtimeException("ERROR LispReader unread", e);
 				// throw Util.sneakyThrow(e);
 			}
 	}
@@ -120,12 +120,12 @@ class LispReader {
 	static public final COND_ALLOW:Keyword = Keyword.intern(null, "allow");
 	static public final COND_PRESERVE:Keyword = Keyword.intern(null, "preserve");
 
-	static public function readString(s:String, opts:IPersistentMap) {
+	static public function readString(s:String, opts:IPersistentMap):Any {
 		var r:LineNumberingPushbackReader = new LineNumberingPushbackReader(s);
 		return read(r, opts);
 	}
 
-	static public function read(r:LineNumberingPushbackReader, opts:Any) {
+	static public function read(r:LineNumberingPushbackReader, opts:Any):Any {
 		var eofIsError:Bool = true;
 		var eofValue:Any = null;
 		if (opts != null && U.instanceof(opts, IPersistentMap)) {
@@ -138,16 +138,16 @@ class LispReader {
 		return read5(r, eofIsError, eofValue, false, opts);
 	}
 
-	static public function read4(r:LineNumberingPushbackReader, eofIsError:Bool, eofValue:Any, isRecursive:Bool) {
+	static public function read4(r:LineNumberingPushbackReader, eofIsError:Bool, eofValue:Any, isRecursive:Bool):Any {
 		return read5(r, eofIsError, eofValue, isRecursive, PersistentHashMap.EMPTY);
 	}
 
-	static public function read5(r:LineNumberingPushbackReader, eofIsError:Bool, eofValue:Any, isRecursive:Bool, opts:Any) {
+	static public function read5(r:LineNumberingPushbackReader, eofIsError:Bool, eofValue:Any, isRecursive:Bool, opts:Any):Any {
 		// start with pendingForms null as reader conditional splicing is not allowed at top level
-		return read9(r, eofIsError, eofValue, null, null, isRecursive, opts, null, cast(RT.READER_RESOLVER.deref(), LispReader.Resolver));
+		return read9(r, eofIsError, eofValue, null, null, isRecursive, opts, null, RT.READER_RESOLVER.deref());
 	}
 
-	static public function read6(r:LineNumberingPushbackReader, eofIsError:Bool, eofValue:Any, isRecursive:Bool, opts:Any, pendingForms:Any) {
+	static public function read6(r:LineNumberingPushbackReader, eofIsError:Bool, eofValue:Any, isRecursive:Bool, opts:Any, pendingForms:Any):Any {
 		return read9(r, eofIsError, eofValue, null, null, isRecursive, opts, ensurePending(pendingForms),
 			cast(RT.READER_RESOLVER.deref(), LispReader.Resolver));
 	}
@@ -181,19 +181,17 @@ class LispReader {
 
 		try {
 			while (true) {
-				if (U.instanceof(pendingForms, Array)) {
+				if (U.instanceof(pendingForms, Array) && (pendingForms : Array<Any>).length > 0) {
 					// l.remove(0);
 					return (pendingForms : Array<Any>).shift();
 					/*var l:List<Any> = cast pendingForms;
 						if (!l.isEmpty())
 							return l.pop(); */
 				}
-
 				var ch:Int = read1(r);
 
 				while (isWhitespace(ch))
 					ch = read1(r);
-
 				if (ch == -1) {
 					if (eofIsError)
 						throw Util.runtimeException("EOF while reading");
@@ -210,8 +208,10 @@ class LispReader {
 				}
 
 				var macroFn:IFn = getMacro(ch);
+				// trace(">>> read9 macroFn: " + String.fromCharCode(ch) + " " + macroFn);
 				if (macroFn != null) {
-					var ret:Any = macroFn.invoke(r, ch, opts, pendingForms);
+					var ret:Any = macroFn.invoke4(r, ch, opts, pendingForms);
+					// trace(">>> read9 macroFN ret: " + ret);
 					// no op macros return the reader
 					if (ret == r)
 						continue;
@@ -235,7 +235,7 @@ class LispReader {
 			if (isRecursive || !(U.instanceof(r, LineNumberingPushbackReader)))
 				throw Util.sneakyThrow(e);
 			var rdr:LineNumberingPushbackReader = r;
-			throw new LispReader.ReaderException(rdr.getLineNumber(), rdr.getColumnNumber(), e);
+			throw new LispReader.ReaderExceptionLR(rdr.getLineNumber(), rdr.getColumnNumber(), e);
 		}
 	}
 
@@ -496,7 +496,7 @@ class LispReader {
 	}
 }
 
-class RegexReader extends AFn {
+class RegexReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, doublequote:Any, opts:Any, pendingForms:Any):Any {
@@ -520,7 +520,7 @@ class RegexReader extends AFn {
 	}
 }
 
-class StringReader extends AFn {
+class StringReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, doublequote:Any, opts:Any, pendingForms:Any):Any {
@@ -573,7 +573,7 @@ class StringReader extends AFn {
 	}
 }
 
-class CommentReader extends AFn {
+class CommentReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, semicolon:Any, opts:Any, pendingForms:Any):Any {
@@ -586,7 +586,7 @@ class CommentReader extends AFn {
 	}
 }
 
-class DiscardReader extends AFn {
+class DiscardReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, underscore:Any, opts:Any, pendingForms:Any):Any {
@@ -596,7 +596,7 @@ class DiscardReader extends AFn {
 	}
 }
 
-class NamespaceMapReader extends AFn {
+class NamespaceMapReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, colon:Any, opts:Any, pendingForms:Any):Any {
@@ -705,7 +705,7 @@ class NamespaceMapReader extends AFn {
 	}
 }
 
-class SymbolicValueReader extends AFn {
+class SymbolicValueReaderLR extends AFn {
 	static var specials:IPersistentMap;
 
 	// TODO:
@@ -727,7 +727,7 @@ class SymbolicValueReader extends AFn {
 	}
 }
 
-class WrappingReader extends AFn {
+class WrappingReaderLR extends AFn {
 	var sym:Symbol;
 
 	public function new(sym:Symbol) {
@@ -741,7 +741,7 @@ class WrappingReader extends AFn {
 	}
 }
 
-class VarReader extends AFn {
+class VarReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -751,7 +751,7 @@ class VarReader extends AFn {
 	}
 }
 
-class DispatchReader extends AFn {
+class DispatchReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -769,11 +769,11 @@ class DispatchReader extends AFn {
 			else
 				throw Util.runtimeException("No dispatch macro for: " + String.fromCharCode(ch));
 		}
-		return fn.invoke3(reader, ch, opts);
+		return fn.invoke4(reader, ch, opts, pendingForms);
 	}
 }
 
-class FnReader extends AFn {
+class FnReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -789,7 +789,7 @@ class FnReader extends AFn {
 			var argsyms:PersistentTreeMap = cast LispReader.ARG_ENV.deref();
 			var rargs:ISeq = argsyms.rseq();
 			if (rargs != null) {
-				var higharg:Int = cast(rargs.first, (Map.Entry)).getKey();
+				var higharg:Int = cast(rargs.first(), Map.Entry).getKey();
 				if (higharg > 0) {
 					var i:Int = 1;
 					while (i <= higharg) {
@@ -812,7 +812,7 @@ class FnReader extends AFn {
 	}
 }
 
-class ArgReader extends AFn {
+class ArgReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -835,7 +835,7 @@ class ArgReader extends AFn {
 	}
 }
 
-class MetaReader extends AFn {
+class MetaReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -878,7 +878,7 @@ class MetaReader extends AFn {
 	}
 }
 
-class SyntaxQuoteReader extends AFn {
+class SyntaxQuoteReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -1021,7 +1021,7 @@ class SyntaxQuoteReader extends AFn {
 	}
 }
 
-class UnquoteReader extends AFn {
+class UnquoteReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -1041,7 +1041,7 @@ class UnquoteReader extends AFn {
 	}
 }
 
-class CharacterReader extends AFn {
+class CharacterReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -1084,7 +1084,7 @@ class CharacterReader extends AFn {
 	}
 }
 
-class ListReader extends AFn {
+class ListReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -1095,21 +1095,22 @@ class ListReader extends AFn {
 			line = r.getLineNumber();
 			column = r.getColumnNumber() - 1;
 		}
+
 		var list = LispReader.readDelimitedList(')'.code, r, true, opts, LispReader.ensurePending(pendingForms));
 		if (list.length == 0)
 			return PersistentList.EMPTY;
-		var s:IObj = cast PersistentList.create(list);
+		var s:IObj = cast PersistentList.createFromArray(list);
 		if (line != -1) {
-			var meta:Any = RT.meta(s);
+			var meta:IPersistentMap = RT.meta(s);
 			meta = cast RT.assoc(meta, RT.LINE_KEY, RT.get(meta, RT.LINE_KEY, line));
 			meta = cast RT.assoc(meta, RT.COLUMN_KEY, RT.get(meta, RT.COLUMN_KEY, column));
-			return s.withMeta(cast(meta, IPersistentMap));
+			return s.withMeta(meta);
 		} else
 			return s;
 	}
 }
 
-class EvalReader extends AFn {
+class EvalReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -1145,7 +1146,7 @@ class EvalReader extends AFn {
 	}
 }
 
-class VectorReader extends AFn {
+class VectorReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -1154,7 +1155,7 @@ class VectorReader extends AFn {
 	}
 }
 
-class MapReader extends AFn {
+class MapReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -1166,16 +1167,17 @@ class MapReader extends AFn {
 	}
 }
 
-class SetReader extends AFn {
+class SetReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
 		var r:LineNumberingPushbackReader = cast reader;
-		return PersistentHashSet.createWithCheck(LispReader.readDelimitedList('}'.code, r, true, opts, LispReader.ensurePending(pendingForms)));
+		var list = LispReader.readDelimitedList('}'.code, r, true, opts, LispReader.ensurePending(pendingForms));
+		return PersistentHashSet.createWithCheckFromIter(list.iterator());
 	}
 }
 
-class UnmatchedDelimiterReader extends AFn {
+class UnmatchedDelimiterReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -1183,7 +1185,7 @@ class UnmatchedDelimiterReader extends AFn {
 	}
 }
 
-class UnreadableReader extends AFn {
+class UnreadableReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -1191,7 +1193,7 @@ class UnreadableReader extends AFn {
 	}
 }
 
-class CtorReader extends AFn {
+class CtorReaderLR extends AFn {
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
@@ -1279,7 +1281,7 @@ class CtorReader extends AFn {
 	}
 }
 
-class ConditionalReader extends AFn {
+class ConditionalReaderLR extends AFn {
 	static private final READ_STARTED:Any = EMPTY_ARG.NO_ARG; // Symbol.createNSname();
 	static public final DEFAULT_FEATURE:Keyword = Keyword.intern(null, "default");
 	static public final RESERVED_FEATURES:IPersistentSet = RT.set(Keyword.intern(null, "else"), Keyword.intern(null, "none"));
@@ -1449,7 +1451,7 @@ interface Resolver {
 	public function resolveVar(sym:Symbol):Symbol;
 }
 
-class ReaderException extends RuntimeException implements IExceptionInfo {
+class ReaderExceptionLR extends RuntimeException implements IExceptionInfo {
 	var lin:Int;
 	var column:Int;
 
@@ -1460,7 +1462,7 @@ class ReaderException extends RuntimeException implements IExceptionInfo {
 	static public final ERR_COLUMN:Keyword = Keyword.intern(ERR_NS, "column");
 
 	public function new(line:Int, column:Int, cause:Exception) {
-		super("EDN reading error in line: " + line + ", column: " + column + " " + cause, cause);
+		super("LispReader reading error in line: " + line + ", column: " + column + " " + cause, cause);
 		this.lin = line;
 		this.column = column;
 		this.data = RT.map(ERR_LINE, line, ERR_COLUMN, column);

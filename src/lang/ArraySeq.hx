@@ -49,7 +49,7 @@ class ArraySeq extends ASeq implements IndexedSeq implements IReduce {
 		return i;
 	}
 
-	override public function withMeta(meta:IPersistentMap):ArraySeq {
+	public function withMeta(meta:IPersistentMap):ArraySeq {
 		if (super.meta() == meta)
 			return this;
 		return new ArraySeq(array, i, meta);

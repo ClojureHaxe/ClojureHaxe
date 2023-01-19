@@ -270,7 +270,7 @@ class KeySeq extends ASeq {
 		return cast create(_seq.next());
 	}
 
-	override public function withMeta(meta:IPersistentMap):KeySeq {
+	public function withMeta(meta:IPersistentMap):KeySeq {
 		if (this.meta() == meta)
 			return this;
 		return new KeySeq(_seq, iterable, meta);
@@ -343,7 +343,7 @@ class ValSeq extends ASeq {
 		return create(_seq.next());
 	}
 
-	override public function withMeta(meta:IPersistentMap):ValSeq {
+	public function withMeta(meta:IPersistentMap):ValSeq {
 		if (this.meta() == meta)
 			return this;
 		return new ValSeq(_seq, iterable, meta);

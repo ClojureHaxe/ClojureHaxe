@@ -79,6 +79,12 @@ implements Counted {
 		return EMPTY.withMeta(meta());
 	}
 
+	public function withMeta(meta:IPersistentMap):PersistentList {
+		if (meta != super.meta())
+			return new PersistentList(_first, _rest, _count, meta);
+		return this;
+	}
+
 	public function reduce1(f:IFn):Any {
 		var ret:Any = first();
 		var s:ISeq = next();
@@ -198,7 +204,7 @@ implements ISeq implements Counted implements IHashEq implements IEqual implemen
 		return this;
 	}
 
-	override public function withMeta(meta:IPersistentMap):EmptyList {
+	public function withMeta(meta:IPersistentMap):EmptyList {
 		if (meta != super.meta()) {
 			return new EmptyList(meta);
 		}

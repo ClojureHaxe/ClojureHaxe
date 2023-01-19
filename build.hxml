@@ -10,26 +10,26 @@
 # --cs bin/cs
 # --next
 
-# --php bin/php
-# --next 
+--js bin/js/main.js
+--next
 
-# --lua bin/lua/main.lua
-# --next
+--php bin/php
+--next 
 
-# --hl bin/hl/main.hl 
-# --next
+--lua bin/lua/main.lua
+--next
 
-# --java bin/java
-# --next
+--hl bin/hl/main.hl 
+--next
 
-# --js bin/js/main.js
-# --next
+--java bin/java
+--next
 
-# --python bin/python/main.py
-# --next
+--python bin/python/main.py
+--next
 
-# --cpp bin/cpp/
-# --next
+--cpp bin/cpp/
+--next
 
 
 --interp

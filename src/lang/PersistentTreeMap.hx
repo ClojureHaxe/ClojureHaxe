@@ -776,7 +776,7 @@ class PTMSeq extends ASeq {
 		return cnt;
 	}
 
-	override public function withMeta(meta:IPersistentMap):Obj {
+	public function withMeta(meta:IPersistentMap):Obj {
 		if (super.meta() == meta)
 			return this;
 		return new PTMSeq(meta, stack, asc, cnt);

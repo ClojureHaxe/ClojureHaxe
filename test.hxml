@@ -11,10 +11,10 @@
 # --jvm testBin/jvm/main.jar
 # --next
 
-# --hl testBin/hl/main.hl 
+# --js testBin/js/main.js
 # --next
 
-# --js testBin/js/main.js
+# --hl testBin/hl/main.hl 
 # --next
 
 # --lua testBin/lua/main.lua

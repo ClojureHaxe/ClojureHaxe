@@ -5,22 +5,18 @@ import lang.exceptions.*;
 import utest.Assert;
 
 class LispReaderTest extends utest.Test {
-	
-	/*
 	function parse(s:String):Any {
 		var opts:PersistentArrayMap = PersistentArrayMap.EMPTY;
 		return LispReader.readString(s, opts);
 	}
-	*/
 
 	function test() {
-		Assert.equals(true, true);
+		Assert.isTrue(true);
 		// numbers
-		/*
 		Assert.equals(10, parse("10"));
 		Assert.equals(10.5, parse("10.5"));
 		Assert.equals(0, parse("0"));
-/*
+
 		// keyword
 		var res = parse(":keyword");
 		Assert.isTrue(Keyword.create1("keyword").equals(res));
@@ -50,16 +46,14 @@ class LispReaderTest extends utest.Test {
 		Assert.equals("$", parse(" \\u0024  "));
 		Assert.equals("Ω", parse(" \\u03A9  "));
 		Assert.equals("\n", parse(" \\o12  "));
-*/
+
 		// exception
-		/*
-			try {
-				parse("  \\rr");
-			} catch (e) {
-				Assert.isTrue(U.instanceof(e, LispReader.ReaderException));
-			}
-		 */
-/*
+		try {
+			parse("  \\rr");
+		} catch (e) {
+			Assert.isTrue(U.instanceof(e, LispReader.ReaderExceptionLR));
+		}
+
 		// list
 		Assert.equals("(1 2 3)", cast(parse(" (1 2 3) "), PersistentList).toString());
 
@@ -90,13 +84,11 @@ class LispReaderTest extends utest.Test {
 		var k = Keyword.createNSname("const");
 		Assert.equals(true, m.valAt(k));
 
-        // TODO: doesn't work in Java because of https://github.com/HaxeFoundation/haxe/issues/10906
+		// TODO: doesn't work in Java because of https://github.com/HaxeFoundation/haxe/issues/10906
 		p = cast parse(" #^{1 2} [1]");
 		m = p.meta();
 		Assert.equals(1, p.count());
 		Assert.isTrue(Util.pcequiv(PersistentVector.createFromItems(1), p));
 		Assert.equals(2, m.valAt(1));
-
-        */
 	}
 }
