@@ -26,12 +26,21 @@ class PersistentHashMap extends APersistentMap implements IEditableCollection im
 	}
 
 	public static function create(...init:Any):PersistentHashMap {
-		var ret:ITransientMap = EMPTY.asTransient();
+		// TODO: bug in HL: SIGNAL 11, segmentation fault if use ITransientMap
+		// var ret:ITransientMap = EMPTY.asTransient();
+		var ret:TransientHashMap = EMPTY.asTransient();
 		var i:Int = 0;
 		while (i < init.length) {
-			ret = ret.assoc(init[i], init[i + 1]);
+			ret = cast ret.assoc(init[i], init[i + 1]);
 			i += 2;
 		}
+		// trace("TRANS:" + ret);
+		// var z:PersistentHashMap;
+		// var r:IPersistentCollection =( ret.persistent());
+		// var r2:PersistentHashMap = cast r;
+		// trace("RET:" + r);
+		// trace("Hello");
+		// return cast(r, PersistentHashMap);
 		return cast ret.persistent();
 	}
 

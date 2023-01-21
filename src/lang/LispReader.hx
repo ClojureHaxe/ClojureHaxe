@@ -148,8 +148,8 @@ class LispReader {
 	}
 
 	static public function read6(r:LineNumberingPushbackReader, eofIsError:Bool, eofValue:Any, isRecursive:Bool, opts:Any, pendingForms:Any):Any {
-		return read9(r, eofIsError, eofValue, null, null, isRecursive, opts, ensurePending(pendingForms),
-			cast(RT.READER_RESOLVER.deref(), LispReader.Resolver));
+		// No need to cast  RT.READER_RESOLVER.deref() to LispReader.Resolver cause if it null in CPP it raise error
+		return read9(r, eofIsError, eofValue, null, null, isRecursive, opts, ensurePending(pendingForms), RT.READER_RESOLVER.deref());
 	}
 
 	static public function ensurePending(pendingForms:Any):Any {
@@ -174,7 +174,7 @@ class LispReader {
 
 	static public function read9(r:LineNumberingPushbackReader, eofIsError:Bool, eofValue:Any, returnOn:String, returnOnValue:Any, isRecursive:Bool, opts:Any,
 			pendingForms:Any, resolver:LispReader.Resolver):Any {
-		if (RT.READEVAL.deref() == UNKNOWN)
+		if (UNKNOWN == RT.READEVAL.deref())
 			throw Util.runtimeException("Reading disallowed - *read-eval* bound to :unknown");
 
 		opts = installPlatformFeature(opts);
@@ -211,9 +211,9 @@ class LispReader {
 				// trace(">>> read9 macroFn: " + String.fromCharCode(ch) + " " + macroFn);
 				if (macroFn != null) {
 					var ret:Any = macroFn.invoke4(r, ch, opts, pendingForms);
-					// trace(">>> read9 macroFN ret: " + ret);
+					//	trace(">>> read9 macroFN ret: " + ret);
 					// no op macros return the reader
-					if (ret == r)
+					if (r == ret)
 						continue;
 					return ret;
 				}
@@ -232,6 +232,7 @@ class LispReader {
 				return interpretToken(token, resolver);
 			}
 		} catch (e) {
+			// trace("STACK:" + e);
 			if (isRecursive || !(U.instanceof(r, LineNumberingPushbackReader)))
 				throw Util.sneakyThrow(e);
 			var rdr:LineNumberingPushbackReader = r;
@@ -706,17 +707,12 @@ class NamespaceMapReaderLR extends AFn {
 }
 
 class SymbolicValueReaderLR extends AFn {
-	static var specials:IPersistentMap;
-
-	// TODO:
-	// = PersistentHashMap.create(Symbol.internNSname("Inf"), Math.POSITIVE_INFINITY, Symbol.internNSname("-Inf"),
-	//		Math.NEGATIVE_INFINITY, Symbol.internNSname("NaN"), Math.NaN);
+	static var specials:IPersistentMap = PersistentHashMap.create(Symbol.internNSname("Inf"), Math.POSITIVE_INFINITY, Symbol.internNSname("-Inf"),
+		Math.NEGATIVE_INFINITY, Symbol.internNSname("NaN"), Math.NaN);
 
 	public function new() {}
 
 	override public function invoke4(reader:Any, rightdelim:Any, opts:Any, pendingForms:Any):Any {
-		specials = PersistentHashMap.create(Symbol.internNSname("Inf"), Math.POSITIVE_INFINITY, Symbol.internNSname("-Inf"), Math.NEGATIVE_INFINITY,
-			Symbol.internNSname("NaN"), Math.NaN);
 		var r:LineNumberingPushbackReader = cast reader;
 		var o:Any = LispReader.read6(r, true, null, true, opts, LispReader.ensurePending(pendingForms));
 		if (!(U.instanceof(o, Symbol)))

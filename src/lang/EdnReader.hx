@@ -689,17 +689,12 @@ class UnreadableReader extends AFn {
 }
 
 class SymbolicValueReader extends AFn {
-	static var specials:IPersistentMap;
-
-	// TODO:
-	// = PersistentHashMap.create(Symbol.internNSname("Inf"), Math.POSITIVE_INFINITY, Symbol.internNSname("-Inf"),
-	//		Math.NEGATIVE_INFINITY, Symbol.internNSname("NaN"), Math.NaN);
+	static var specials:IPersistentMap = PersistentHashMap.create(Symbol.internNSname("Inf"), Math.POSITIVE_INFINITY, Symbol.internNSname("-Inf"),
+		Math.NEGATIVE_INFINITY, Symbol.internNSname("NaN"), Math.NaN);
 
 	public function new() {}
 
 	override public function invoke3(reader:Any, rightdelim:Any, opts:Any):Any {
-		specials = PersistentHashMap.create(Symbol.internNSname("Inf"), Math.POSITIVE_INFINITY, Symbol.internNSname("-Inf"), Math.NEGATIVE_INFINITY,
-			Symbol.internNSname("NaN"), Math.NaN);
 		var r:LineNumberingPushbackReader = cast reader;
 		var o:Any = EdnReader.read5(r, true, null, true, opts);
 		if (!(U.instanceof(o, Symbol)))
