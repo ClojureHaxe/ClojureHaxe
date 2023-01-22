@@ -202,6 +202,45 @@ class RT {
 						scriptbase.contains("_") ? " Please check that namespaces with dashes use underscores in the Clojure file name." : ""));
 		} 
 	 */
+	static public function init() {
+		doInit();
+	}
+
+	private static var INIT:Bool = false;
+
+	@:synchronized private static function doInit() {
+		if (INIT) {
+			return;
+		} else {
+			INIT = true;
+		}
+
+		Var.pushThreadBindings(RT.mapUniqueKeys(CURRENT_NS, CURRENT_NS.deref(), WARN_ON_REFLECTION, WARN_ON_REFLECTION.deref(), RT.UNCHECKED_MATH,
+			RT.UNCHECKED_MATH.deref()));
+		try {
+			var USER:Symbol = Symbol.intern1("user");
+			var CLOJURE:Symbol = Symbol.intern1("clojure.core");
+
+			var in_ns:Var = var2("clojure.core", "in-ns");
+			var refer:Var = var2("clojure.core", "refer");
+			in_ns.invoke1(USER);
+			refer.invoke1(CLOJURE);
+			// TODO: skip for now?
+			// maybeLoadResourceScript("user.clj");
+
+			// start socket servers
+			// var require:Var = var2("clojure.core", "require");
+			// var SERVER:Symbol = Symbol.intern1("clojure.core.server");
+			// require.invoke1(SERVER);
+			// var start_servers:Var = var2("clojure.core.server", "start-servers");
+			// start_servers.invoke(System.getProperties());
+			Var.popThreadBindings();
+		} catch (e) {
+			Var.popThreadBindings();
+			throw Util.sneakyThrow(e);
+		}
+	}
+
 	static public function nextID():Int {
 		return id++;
 	}
@@ -239,9 +278,9 @@ class RT {
 		//     return ArraySeq.createFromObject(coll);
 		else if (U.instanceof(coll, String))
 			return StringSeq.create(coll);
-		//else if (U.instanceof(coll, Map)){
-	//		return seq(haxe.ds.Map.keyValueIterator(coll));
-//		}
+			// else if (U.instanceof(coll, Map)){
+			//		return seq(haxe.ds.Map.keyValueIterator(coll));
+		//		}
 		else if (U.instanceof(coll, EntrySet))
 			return seq(cast(coll, EntrySet).entrySet());
 		else {
@@ -875,8 +914,8 @@ class RT {
 			}
 			sb.add('}');
 		} else {
-			sb.add('$x');
-			// sb.add(Std.string(x));
+			// sb.add('$x');
+			sb.add(Std.string(x));
 		}
 	}
 

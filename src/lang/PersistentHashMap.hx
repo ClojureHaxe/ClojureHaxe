@@ -44,6 +44,17 @@ class PersistentHashMap extends APersistentMap implements IEditableCollection im
 		return cast ret.persistent();
 	}
 
+	public static function createFromVector(init:Vector<Any>, ?meta:IPersistentMap):PersistentHashMap {
+		var ret:TransientHashMap = EMPTY.asTransient();
+		var i:Int = 0;
+		while (i < init.length) {
+			ret = cast ret.assoc(init[i], init[i + 1]);
+			i += 2;
+		}
+		var r:PersistentHashMap = cast ret.persistent();
+		return r.withMeta(meta);
+	}
+
 	public static function createWithCheck(...init:Any):PersistentHashMap {
 		var ret:ITransientMap = EMPTY.asTransient();
 		var i:Int = 0;
@@ -86,7 +97,7 @@ class PersistentHashMap extends APersistentMap implements IEditableCollection im
 	}
 
 	static public function createWithMeta(meta:IPersistentMap, ...init:Any):PersistentHashMap {
-		return create(init).withMeta(meta);
+		return create(...init).withMeta(meta);
 	}
 
 	public function new(count:Int, root:INode, hasNull:Bool, nullValue:Any, ?meta:IPersistentMap) {

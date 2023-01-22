@@ -50,7 +50,7 @@ class PersistentArrayMap extends APersistentMap implements IObj implements IEdit
 	}
 
 	private function createHT(init:Vector<Any>):IPersistentMap {
-		return PersistentHashMap.create(meta(), init);
+		return PersistentHashMap.createFromVector(init, meta());
 	}
 
 	static public function createWithCheck(...init):PersistentArrayMap {

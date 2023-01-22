@@ -58,6 +58,7 @@ final class Var extends ARef implements IFn implements IRef implements Settable 
 	}
 
 	public static function intern4(ns:Namespace, sym:Symbol, root:Any, replaceRoot:Bool):Var {
+		// trace(">>>>>>>>>>>>>>>> Var intern4 :" + ns + "   " + sym + " " + root + " " + replaceRoot);
 		var dvout:Var = ns.intern(sym);
 		if (!dvout.hasRoot() || replaceRoot)
 			dvout.bindRoot(root);
