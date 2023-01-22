@@ -29,7 +29,7 @@ implements Collection {
 	// TODO: syncrhonized
 	final public function sval():Any {
 		if (fn != null) {
-			sv = fn.invoke();
+			sv = fn.invoke0();
 			fn = null;
 		}
 		if (sv != null)

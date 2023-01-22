@@ -11,7 +11,8 @@ class Namespace extends AReference {
 	public var mappings:IPersistentMap;
 	public var aliases:IPersistentMap;
 
-	public static var namespaces:Map<Symbol, Namespace> = new Map<Symbol, Namespace>();
+	// public static var namespaces:Map<Symbol, Namespace> = new Map<Symbol, Namespace>();
+	public static var namespaces:PersistentHashMap = PersistentHashMap.EMPTY;
 
 	public function toString():String {
 		return name.toString();
@@ -24,8 +25,8 @@ class Namespace extends AReference {
 		aliases = RT.map();
 	}
 
-	public function all():ISeq {
-		return RT.seq(namespaces.iterator());
+	public static function all():ISeq {
+		return RT.seq(namespaces.valIterator());
 	}
 
 	public function getName():Symbol {
@@ -191,20 +192,17 @@ class Namespace extends AReference {
 		if (ns != null)
 			return ns;
 		var newns:Namespace = new Namespace(name);
-		namespaces.set(name, newns);
+		//namespaces.set(name, newns);
+		namespaces = cast namespaces.assoc(name, newns);
 		return newns;
-		/*if (namespaces.get(name) == null) {
-			namespaces.set(name, newns);
-		}*/
-		// ns = namespaces.putIfAbsent(name, newns);
-		// return ns == null ? newns : ns;
 	}
 
 	public static function remove(name:Symbol):Namespace {
 		if (name.equals(RT.CLOJURE_NS.name))
 			throw new IllegalArgumentException("Cannot remove clojure namespace");
 		var v:Namespace = namespaces.get(name);
-		namespaces.remove(name);
+		// namespaces.remove(name);
+		namespaces = cast namespaces.without(name);
 		return v;
 	}
 

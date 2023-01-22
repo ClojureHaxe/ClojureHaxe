@@ -14,7 +14,7 @@ enum EMPTY_ARG {
 
 class U {
 	// public static final NoArg:Any = new EmptyArg();
-	public static function instanceof(value:Any, c:Any):Bool {
+	public static function instanceof(value:Any, c:Dynamic):Bool {
 		// return Std.downcast(value, c) != null;
 		return Std.isOfType(value, c);
 	}
@@ -33,6 +33,16 @@ class U {
 		} catch (e) {
 			null;
 		}) != null;
+	}
+
+	public static function isIterator(v:Any):Bool {
+		try {
+			(cast v).hasNext();
+			//cast(v, Iterator<Any>);
+			return true;
+		} catch (e) {
+			return false;
+		}
 	}
 
 	public inline static function getIterator(v:Any):Iterator<Any> {
@@ -100,10 +110,10 @@ class U {
 		if (c >= '0'.code && c <= '9'.code) {
 			return c - '0'.code;
 		}
-		if (c >= 'a'.code && c <= 'z'.code){
+		if (c >= 'a'.code && c <= 'z'.code) {
 			return c - 'a'.code + 10;
 		}
-		if (c >= 'A'.code && c <= 'Z'.code){
+		if (c >= 'A'.code && c <= 'Z'.code) {
 			return c - 'A'.code + 10;
 		}
 		throw new IllegalArgumentException('Cannot parse char "$s" to Int');

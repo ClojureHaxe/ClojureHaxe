@@ -25,5 +25,11 @@ class PersistentHashMapTest extends Test {
 		Assert.isTrue(hm.containsKey(1));
 		var hm2:PersistentHashMap = PersistentHashMap.create(Symbol.internNSname("Inf"), 1);
 		Assert.isTrue(hm2.containsKey(Symbol.internNSname("Inf")));
+
+		// Symbol
+		var hm2:PersistentHashMap = PersistentHashMap.EMPTY;
+		var s1:Symbol = Symbol.createNSname("clojure.core");
+		hm2 = cast hm2.assoc(s1, s1);
+		Assert.equals(s1, hm2.get(Symbol.createNSname("clojure.core")));
 	}
 }

@@ -230,6 +230,8 @@ class RT {
 			return cast(coll, Seqable).seq();
 		else if (coll == null)
 			return null;
+		else if (U.isIterator(coll))
+			return chunkIteratorSeq(coll);
 		else if (U.isIterable(coll))
 			return chunkIteratorSeq((cast coll).iterator());
 			// TODO:
@@ -237,10 +239,13 @@ class RT {
 		//     return ArraySeq.createFromObject(coll);
 		else if (U.instanceof(coll, String))
 			return StringSeq.create(coll);
+		//else if (U.instanceof(coll, Map)){
+	//		return seq(haxe.ds.Map.keyValueIterator(coll));
+//		}
 		else if (U.instanceof(coll, EntrySet))
 			return seq(cast(coll, EntrySet).entrySet());
 		else {
-			throw new IllegalArgumentException("Don't know how to create ISeq from: " + Type.getClassName(Type.getClass(coll)));
+			throw new IllegalArgumentException("Don't know how to create ISeq from: " + coll + " :  " + Type.getClassName(coll));
 		}
 		return null;
 	}
