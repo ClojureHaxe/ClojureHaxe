@@ -11,22 +11,25 @@
 # --jvm testBin/jvm/main.jar
 # --next
 
-# --js testBin/js/main.js
-# --next
+--php bin/php
+--next 
 
-# --hl testBin/hl/main.hl 
-# --next
+--js testBin/js/main.js
+--next
 
-# --lua testBin/lua/main.lua
-# --next
+--hl testBin/hl/main.hl 
+--next
 
-# --java testBin/java
-# --next
+--lua testBin/lua/main.lua
+--next
 
-# --python testBin/python/main.py
-# --next
+--java testBin/java
+--next
 
-# --cpp testBin/cpp/
-# --next
+--python testBin/python/main.py
+--next
+
+--cpp testBin/cpp/
+--next
 
 --interp
