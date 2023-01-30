@@ -31,5 +31,10 @@ class PersistentHashMapTest extends Test {
 		var s1:Symbol = Symbol.createNSname("clojure.core");
 		hm2 = cast hm2.assoc(s1, s1);
 		Assert.equals(s1, hm2.get(Symbol.createNSname("clojure.core")));
+
+		// Entry
+		var me:IMapEntry = hm2.entryAt(s1);
+		Assert.equals(s1, me.key());
+		Assert.equals(s1, me.val());
 	}
 }

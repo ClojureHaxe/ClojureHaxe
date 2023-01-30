@@ -14,17 +14,31 @@ enum EMPTY_ARG {
 
 class U {
 	// public static final NoArg:Any = new EmptyArg();
+	// In Java implementation sometimes "new Object();" is used to late compare with itself.
+	// So this creates unique object
+	public static inline function object():UniqueObject {
+		return new UniqueObject();
+	}
+
 	public static function instanceof(value:Any, c:Dynamic):Bool {
 		// return Std.downcast(value, c) != null;
 		return Std.isOfType(value, c);
+	}
+
+	public inline static function getClass(v:Any):Class<Dynamic> {
+		return Type.getClass(v);
 	}
 
 	public inline static function getClassName(v:Any):String {
 		return Type.getClassName(Type.getClass(v));
 	}
 
-	public static function isNumber(x):Bool {
+	public static function isNumber(x:Any):Bool {
 		return (Type.typeof(x) == ValueType.TInt || Type.typeof(x) == ValueType.TFloat || instanceof(x, Ratio));
+	}
+
+	public static function isBool(v:Any):Bool {
+		return Type.typeof(v) == ValueType.TBool;
 	}
 
 	public inline static function isIterable(v:Any):Bool {
@@ -38,7 +52,7 @@ class U {
 	public static function isIterator(v:Any):Bool {
 		try {
 			(cast v).hasNext();
-			//cast(v, Iterator<Any>);
+			// cast(v, Iterator<Any>);
 			return true;
 		} catch (e) {
 			return false;
@@ -158,6 +172,10 @@ class U {
 			return StringLatin1.newString(buf, charPos, 33 - charPos);
 		}
 	}*/
+}
+
+class UniqueObject {
+	public function new() {}
 }
 
 // class EmptyArg {

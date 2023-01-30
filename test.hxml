@@ -11,11 +11,11 @@
 # --jvm testBin/jvm/main.jar
 # --next
 
---php bin/php
---next 
+# --php bin/php
+# --next 
 
---js testBin/js/main.js
---next
+# --js testBin/js/main.js
+# --next
 
 --hl testBin/hl/main.hl 
 --next

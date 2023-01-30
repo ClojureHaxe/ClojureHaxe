@@ -3,7 +3,6 @@ package lang;
 import lang.exceptions.IllegalStateException;
 import lang.exceptions.IllegalArgumentException;
 import lang.misc.Thread;
-
 import haxe.ds.Vector;
 
 final class Var extends ARef implements IFn implements IRef implements Settable // , Serializable
@@ -26,7 +25,7 @@ final class Var extends ARef implements IFn implements IRef implements Settable 
 	@:volatile var root:Any;
 
 	@:volatile var dyn:Bool = false;
-	@:transient var threadBound:Bool;
+	@:transient var threadBound:Bool = false;
 
 	public var sym:Symbol;
 	public var ns:Namespace;
@@ -157,7 +156,7 @@ final class Var extends ARef implements IFn implements IRef implements Settable 
 		validate(getValidator(), val);
 		var b:TBox = getThreadBinding();
 		if (b != null) {
-			if (Thread.currentThread() != b.thread)
+			if (!Thread.equals(Thread.currentThread(), b.thread))
 				throw new IllegalStateException("Can't set!: " + sym + " from non-binding thread");
 			return (b.val = val);
 		}
@@ -277,7 +276,7 @@ final class Var extends ARef implements IFn implements IRef implements Settable 
 		} else if (f == Frame.TOP) {
 			// TODO:
 			// dvals.remove();
-			dvals = null;
+			dvals = f;
 		} else {
 			dvals = f; // .set(f);
 		}
@@ -288,9 +287,9 @@ final class Var extends ARef implements IFn implements IRef implements Settable 
 		var ret:IPersistentMap = PersistentHashMap.EMPTY;
 		var bs:ISeq = f.bindings.seq();
 		while (bs != null) {
-			var e:IMapEntry = cast bs.first();
-			var v:Var = cast e.key();
-			var b:TBox = cast e.val();
+			var e:IMapEntry = bs.first();
+			var v:Var = e.key();
+			var b:TBox = e.val();
 			ret = cast ret.assoc(v, b.val);
 			bs = bs.next();
 		}

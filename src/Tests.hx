@@ -24,7 +24,7 @@ private var init:Bool = {
 
 class Tests {
 	static function main() {
-		//RT.staticInit();
+		RT.staticInit();
 
 		// utest.UTest.run([new test.EdnReaderTest()]);
 

@@ -3,7 +3,7 @@ package lang;
 import lang.exceptions.UnsupportedOperationException;
 import haxe.ds.Vector;
 
-abstract class APersistentSet extends AFn implements IPersistentSet implements IHashEq {
+abstract class APersistentSet extends AFn implements IPersistentSet implements IHashEq implements IEqual {
 	var _hash:Int;
 	var _hasheq:Int;
 	final impl:IPersistentMap;

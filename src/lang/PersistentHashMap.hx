@@ -15,7 +15,7 @@ class PersistentHashMap extends APersistentMap implements IEditableCollection im
 	public var _meta:IPersistentMap;
 
 	public static final EMPTY:PersistentHashMap = new PersistentHashMap(0, null, false, null);
-	private static final NOT_FOUND:Any = new NotFoundMap();
+	private static final NOT_FOUND:Any = U.object();
 
 	static public function createFromMap(other:Map<Any, Any>):IPersistentMap {
 		var ret:ITransientMap = EMPTY.asTransient();
@@ -115,13 +115,13 @@ class PersistentHashMap extends APersistentMap implements IEditableCollection im
 	public function containsKey(key:Any):Bool {
 		if (key == null)
 			return hasNull;
-		return (root != null) ? root.find(0, hash(key), key, NOT_FOUND) != NOT_FOUND : false;
+		return (root != null) ? root.find4(0, hash(key), key, NOT_FOUND) != NOT_FOUND : false;
 	}
 
 	public function entryAt(key:Any):IMapEntry {
 		if (key == null)
 			return hasNull ? MapEntry.create(null, nullValue) : null;
-		return (root != null) ? root.find(0, hash(key), key) : null;
+		return (root != null) ? root.find3(0, hash(key), key) : null;
 	}
 
 	public function assoc(key:Any, val:Any):IPersistentMap {
@@ -140,7 +140,7 @@ class PersistentHashMap extends APersistentMap implements IEditableCollection im
 	public function valAt(key:Any, ?notFound:Any = null):Any {
 		if (key == null)
 			return hasNull ? nullValue : notFound;
-		return root != null ? root.find(0, hash(key), key, notFound) : notFound;
+		return root != null ? root.find4(0, hash(key), key, notFound) : notFound;
 	}
 
 	public function assocEx(key:Any, val:Any):IPersistentMap {
@@ -365,7 +365,7 @@ final class TransientHashMap extends ATransientMap {
 				return notFound;
 		if (root == null)
 			return notFound;
-		return root.find(0, PersistentHashMap.hash(key), key, notFound);
+		return root.find4(0, PersistentHashMap.hash(key), key, notFound);
 	}
 
 	public function doCount():Int {
@@ -419,10 +419,6 @@ class PersistentHashMapEmptyIterator {
 	}
 }
 
-class NotFoundMap {
-	public function new() {};
-}
-
 // INode ==================================================================================
 interface INode {
 	public function assoc5(shift:Int, hash:Int, key:Any, val:Any, addedLeaf:Box):INode;
@@ -430,7 +426,9 @@ interface INode {
 	public function without3(shift:Int, hash:Int, key:Any):INode;
 
 	// public function find(shift:Int, hash:Int, key:Any):IMapEntry;
-	public function find(shift:Int, hash:Int, key:Any, ?notFound:Any):Any;
+	public function find3(shift:Int, hash:Int, key:Any):IMapEntry;
+
+	public function find4(shift:Int, hash:Int, key:Any, notFound:Any):Any;
 
 	public function nodeSeq():ISeq;
 
@@ -504,19 +502,20 @@ class ArrayNode implements INode {
 		return editAndSet(edit, idx, n);
 	}
 
-	/*public function   find(int shift, int hash, Object key):IMapEntry {
-		var idx:Int = mask(hash, shift);
-		INode node = array[idx];
+	public function find3(shift:Int, hash:Int, key:Any):IMapEntry {
+		var idx:Int = PersistentHashMap.mask(hash, shift);
+		var node:INode = array[idx];
 		if (node == null)
 			return null;
-		return node.find(shift + 5, hash, key);
-	}*/
-	public function find(shift:Int, hash:Int, key:Any, ?notFound:Any = null):Any {
+		return node.find3(shift + 5, hash, key);
+	}
+
+	public function find4(shift:Int, hash:Int, key:Any, notFound:Any):Any {
 		var idx:Int = PersistentHashMap.mask(hash, shift);
 		var node:INode = array[idx];
 		if (node == null)
 			return notFound;
-		return node.find(shift + 5, hash, key, notFound);
+		return node.find4(shift + 5, hash, key, notFound);
 	}
 
 	public function nodeSeq():ISeq {
@@ -827,20 +826,21 @@ class BitmapIndexedNode implements INode {
 		return this;
 	}
 
-	/*public IMapEntry find(int shift, int hash, Object key) {
-		int bit = bitpos(hash, shift);
+	public function find3(shift:Int, hash:Int, key:Any):IMapEntry {
+		var bit:Int = PersistentHashMap.bitpos(hash, shift);
 		if ((bitmap & bit) == 0)
 			return null;
-		int idx = index(bit);
-		Object keyOrNull = array[2 * idx];
-		Object valOrNode = array[2 * idx + 1];
+		var idx:Int = index(bit);
+		var keyOrNull:Any = array[2 * idx];
+		var valOrNode:Any = array[2 * idx + 1];
 		if (keyOrNull == null)
-			return ((INode) valOrNode).find(shift + 5, hash, key);
+			return (valOrNode : INode).find3(shift + 5, hash, key);
 		if (Util.equiv(key, keyOrNull))
-			return (IMapEntry) MapEntry.create(keyOrNull, valOrNode);
+			return MapEntry.create(keyOrNull, valOrNode);
 		return null;
-	}*/
-	public function find(shift:Int, hash:Int, key:Any, ?notFound:Any = null):Any {
+	}
+
+	public function find4(shift:Int, hash:Int, key:Any, notFound:Any):Any {
 		var bit:Int = PersistentHashMap.bitpos(hash, shift);
 		if ((bitmap & bit) == 0)
 			return notFound;
@@ -848,7 +848,7 @@ class BitmapIndexedNode implements INode {
 		var keyOrNull:Any = array[2 * idx];
 		var valOrNode:Any = array[2 * idx + 1];
 		if (keyOrNull == null)
-			return cast(valOrNode, INode).find(shift + 5, hash, key, notFound);
+			return cast(valOrNode, INode).find4(shift + 5, hash, key, notFound);
 		if (Util.equiv(key, keyOrNull))
 			return valOrNode;
 		return notFound;
@@ -1037,14 +1037,15 @@ class HashCollisionNode implements INode {
 		return new HashCollisionNode(null, hash, _count - 1, PersistentHashMap.removePair(array, idx >> 1));
 	}
 
-	/*public function find(int shift, int hash, Object key):IMapEntry {
-		int idx = findIndex(key);
+	public function find3(shift:Int, hash:Int, key:Any):IMapEntry {
+		var idx:Int = findIndex(key);
 		if (idx < 0)
 			return null;
 		else
-			return (IMapEntry) MapEntry.create(array[idx], array[idx + 1]);
-	}*/
-	public function find(shift:Int, hash:Int, key:Any, notFound:Any = null):Any {
+			return MapEntry.create(array[idx], array[idx + 1]);
+	}
+
+	public function find4(shift:Int, hash:Int, key:Any, notFound):Any {
 		var idx:Int = findIndex(key);
 		if (idx < 0)
 			return notFound;

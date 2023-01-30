@@ -78,6 +78,11 @@ implements Comparable {
 		return this.sym.equals(k.sym);
 	}
 
+	
+	/*public inline function equals(other:Thread):Bool {
+		return getHandle().id() == other.getHandle().id();
+	}*/
+
 	// IFn
 
 	/*override public function throwArity(n:Int):Any {

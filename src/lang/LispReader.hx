@@ -1448,8 +1448,8 @@ interface Resolver {
 }
 
 class ReaderExceptionLR extends RuntimeException implements IExceptionInfo {
-	var lin:Int;
-	var column:Int;
+	public var line:Int;
+	public var column:Int;
 
 	public var data:Any;
 
@@ -1459,7 +1459,7 @@ class ReaderExceptionLR extends RuntimeException implements IExceptionInfo {
 
 	public function new(line:Int, column:Int, cause:Exception) {
 		super("LispReader reading error in line: " + line + ", column: " + column + " " + cause, cause);
-		this.lin = line;
+		this.line = line;
 		this.column = column;
 		this.data = RT.map(ERR_LINE, line, ERR_COLUMN, column);
 	}

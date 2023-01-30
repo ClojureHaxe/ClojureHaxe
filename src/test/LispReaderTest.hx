@@ -11,17 +11,19 @@ class LispReaderTest extends utest.Test {
 	}
 
 	function test() {
-		Assert.isTrue(true);
+		// nil
+		Assert.equals(null, parse("nil"));
+
+		// bool
+		Assert.equals(true, parse("true"));
+		Assert.equals(false, parse("false"));
+
 		// numbers
 		Assert.equals(10, parse("10"));
 		Assert.equals(10.5, parse("10.5"));
 		Assert.equals(0, parse("0"));
-
-		// keyword
-		var res = parse(":keyword");
-		Assert.isTrue(Keyword.create1("keyword").equals(res));
-		res = parse(":a/b");
-		Assert.isTrue(Keyword.create1("a/b").equals(res));
+		Assert.equals(1, parse("1"));
+		Assert.equals(2, parse("2"));
 
 		// ratio
 		Assert.equals(0.5, parse("1/2"));

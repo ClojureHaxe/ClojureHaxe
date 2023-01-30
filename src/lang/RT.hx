@@ -7,6 +7,11 @@ import lang.exceptions.IndexOutOfBoundsException;
 import lang.exceptions.NoSuchElementException;
 import lang.exceptions.UnsupportedOperationException;
 import haxe.ds.Vector;
+import haxe.Exception;
+#if (target.sys)
+import sys.FileSystem;
+import sys.io.File;
+#end
 
 class RT {
 	static public final T:Bool = true;
@@ -51,12 +56,12 @@ class RT {
 	static public final ASSERT:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*assert*"), T).setDynamic();
 	static public final MATH_CONTEXT:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*math-context*"), null).setDynamic();
 
-	static var EVAL_FILE_KEY:Keyword = Keyword.intern("clojure.core", "eval-file");
+	static public final EVAL_FILE_KEY:Keyword = Keyword.intern("clojure.core", "eval-file");
 	static public final LINE_KEY:Keyword = Keyword.intern(null, "line");
 	static public final COLUMN_KEY:Keyword = Keyword.intern(null, "column");
-	static var FILE_KEY:Keyword = Keyword.intern(null, "file");
-	static var DECLARED_KEY:Keyword = Keyword.intern(null, "declared");
-	static var DOC_KEY:Keyword = Keyword.intern(null, "doc");
+	static public var FILE_KEY:Keyword = Keyword.intern(null, "file");
+	static public var DECLARED_KEY:Keyword = Keyword.intern(null, "declared");
+	static public var DOC_KEY:Keyword = Keyword.intern(null, "doc");
 
 	static public final USE_CONTEXT_CLASSLOADER:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*use-context-classloader*"), T).setDynamic();
 
@@ -76,7 +81,7 @@ class RT {
 	static final PRINT_META:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*print-meta*"), F).setDynamic();
 	static final PRINT_READABLY:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*print-readably*"), T).setDynamic();
 	static final PRINT_DUP:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*print-dup*"), F).setDynamic();
-	static final WARN_ON_REFLECTION:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*warn-on-reflection*"), F).setDynamic();
+	static public final WARN_ON_REFLECTION:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*warn-on-reflection*"), F).setDynamic();
 	static final ALLOW_UNRESOLVED_VARS:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*allow-unresolved-vars*"), F).setDynamic();
 	static public final READER_RESOLVER:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*reader-resolver*"), null).setDynamic();
 
@@ -141,7 +146,8 @@ class RT {
 			// TODO:
 			trace("Loading clojure/core");
 			// load("clojure/core");
-		} catch (e) {
+		} catch (e:Exception) {
+			// trace("Error while loading clojure/core", e, e.stack);
 			throw Util.sneakyThrow(e);
 		}
 
@@ -160,55 +166,72 @@ class RT {
 		return Var.intern3(Namespace.findOrCreate(Symbol.intern(null, ns)), Symbol.intern(null, name), init);
 	}
 
-	static public function load(scriptBase:String) {
-		// load2(scriptBase,true);
+	public static function loadResourceScript(name:String) {
+		loadResourceScript2(name, true);
 	}
 
-	/*
-		static public function load( scriptbase:String,  failIfNotFound:Bool) {
-			var classfile:String = scriptbase + LOADER_SUFFIX + ".class";
-			var cljfile:String = scriptbase + ".clj";
-			var cljcfile:String = scriptbase + ".cljc";
-			var scriptfile:String = cljfile;
-			URL classURL = getResource(baseLoader(), classfile);
-			URL cljURL = getResource(baseLoader(), scriptfile);
-			if (cljURL == null) {
-				scriptfile = cljcfile;
-				cljURL = getResource(baseLoader(), scriptfile);
+	public static function loadResourceScript2(name:String, failIfNotFound:Bool) {
+		var r = new EReg("/", "");
+		var file:String = r.split(name).pop();
+		var data:String = File.getContent("src/" + name);
+		trace("FILE NAME: " + file);
+		trace("Content: " + data);
+		// var slash:Int  = StringTools.i name.lastIndexOf('/');
+		// String file = slash >= 0 ? name.substring(slash + 1) : name;
+		// InputStream ins = resourceAsStream(baseLoader(), name);
+		// TODO: inputStream vs string?
+		if (data != null) {
+			try {
+				Compiler.load(data, name, file);
 			}
-			boolean loaded = false;
+		} else if (failIfNotFound) {
+			throw new Exception("Could not locate Clojure resource on classpath: " + name);
+		}
+	}
 
-			if ((classURL != null &&
-					(cljURL == null
-							|| lastModified(classURL, classfile) > lastModified(cljURL, scriptfile)))
-					|| classURL == null) {
-				try {
-					Var.pushThreadBindings(
-							RT.mapUniqueKeys(CURRENT_NS, CURRENT_NS.deref(),
-									WARN_ON_REFLECTION, WARN_ON_REFLECTION.deref()
-									, RT.UNCHECKED_MATH, RT.UNCHECKED_MATH.deref()));
-					loaded = (loadClassForName(scriptbase.replace('/', '.') + LOADER_SUFFIX) != null);
-				} finally {
-					Var.popThreadBindings();
-				}
+	static public function load(scriptBase:String) {
+		load2(scriptBase, true);
+	}
+
+	static public function load2(scriptbase:String, failIfNotFound:Bool) {
+		// var classfile:String = scriptbase + LOADER_SUFFIX + ".class";
+		var cljfile:String = scriptbase + ".clj";
+		var cljcfile:String = scriptbase + ".cljc";
+		var scriptfile:String = cljfile;
+		// var	classURL = getResource(baseLoader(), classfile);
+
+		var cljURL = getResource(scriptfile);
+		trace("RES: " + cljURL);
+		if (cljURL == null) {
+			scriptfile = cljcfile;
+			cljURL = getResource(scriptfile);
+		}
+
+		if (cljURL != null) {
+			if (booleanCast(Compiler.COMPILE_FILES.deref())) {
+				trace(">>>>>>>>>>>>>>>> COMPILE " + cljURL);
+				// compile(scriptfile);
+			} else {
+				trace(">>>>>>>>>>>>>>>> LOAD " + cljURL);
+				loadResourceScript(scriptfile);
 			}
-			if (!loaded && cljURL != null) {
-				if (booleanCast(Compiler.COMPILE_FILES.deref()))
-					compile(scriptfile);
-				else
-					loadResourceScript(RT.class, scriptfile);
-			} else if (!loaded && failIfNotFound)
-				throw new FileNotFoundException(String.format("Could not locate %s, %s or %s on classpath.%s", classfile, cljfile, cljcfile,
-						scriptbase.contains("_") ? " Please check that namespaces with dashes use underscores in the Clojure file name." : ""));
-		} 
-	 */
+		} else if (failIfNotFound)
+			throw new Exception("Could not locate "
+				+ cljfile
+				+ " or "
+				+ cljcfile
+				+ " on classpath.%s"
+				+ (StringTools.contains(scriptbase, "_") ? " Please check that namespaces with dashes use underscores in the Clojure file name." : ""));
+	}
+
 	static public function init() {
 		doInit();
 	}
 
 	private static var INIT:Bool = false;
 
-	@:synchronized private static function doInit() {
+	@:synchronized
+	private static function doInit() {
 		if (INIT) {
 			return;
 		} else {
@@ -932,6 +955,19 @@ class RT {
 	}
 
 	///////////////////////////////// values //////////////////////////
+	static public function getResource(name:String):String {
+		/*if (loader == null) {
+				return ClassLoader.getSystemResource(name);
+			} else {
+				return loader.getResource(name);
+		}*/
+		var fullPath:String = "src/" + name;
+		if (FileSystem.exists(fullPath)) {
+			return fullPath;
+		} else
+			return null;
+	}
+
 	static public function classForName(name:String):Class<Dynamic> {
 		// return classForName(name, true, baseLoader());
 		return Type.resolveClass(name);

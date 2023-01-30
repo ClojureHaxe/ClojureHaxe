@@ -17,4 +17,21 @@ class Thread {
 		#end
 		return CURRENT;
 	}
+
+	/*@:op(A == B)
+		public inline function equals(other:Thread):Bool {
+			#if (target.threaded)
+			return Th.current();
+			#else 
+			return this == other;
+			#end
+
+			return getHandle().id() == other.getHandle().id();
+	}*/
+	static public function equals(thread1:Any, thread2:Any):Bool {
+		#if (target.threaded)
+		return (thread1 : Th) == (thread2 : Th);
+		#end
+		return thread1 == thread2;
+	}
 }

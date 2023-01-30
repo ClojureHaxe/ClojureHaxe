@@ -28,6 +28,20 @@ import lang.AReference;
 import lang.Namespace;
 import lang.EdnReader;
 
+private var init:Bool = {
+	// trace("Static field initialization");
+	PersistentHashMap.BitmapIndexedNode.EMPTY;
+	PersistentHashMap.EMPTY;
+	//trace("PersistentHashMap.EMPTY", PersistentHashMap.EMPTY);
+	//trace(PersistentHashMap.create(1,2));
+	//Namespace.namespaces;	
+	PersistentList.EMPTY;
+	//PersistentHashMap.EMPTY;
+	//
+	true;
+}
+
+
 class Main {
 	static function main() {
 		// //trace(haxe.Log.formatOutput(20 ));
