@@ -4,12 +4,10 @@ import lang.exceptions.UnsupportedOperationException;
 import haxe.Exception;
 import haxe.ds.Vector;
 
-abstract class ASeq extends Obj implements ISeq implements Sequential // TODO:
-// implements List
-// implements Serializable
+abstract class ASeq extends Obj implements ISeq implements Sequential // TODO: implements List implements Serializable
 implements IHashEq implements Collection {
-	var _hash:Int;
-	var _hasheq:Int;
+	var _hash:Int = 0;
+	var _hasheq:Int = 0;
 
 	public function toString():String {
 		return RT.printString(this);

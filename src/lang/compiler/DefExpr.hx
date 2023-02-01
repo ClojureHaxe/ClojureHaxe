@@ -84,7 +84,7 @@ class DefExprParser implements IParser {
 		var v:Var = Compiler.lookupVar(sym, true);
 		if (v == null)
 			throw Util.runtimeException("Can't refer to qualified var that doesn't exist");
-		if (!v.ns.equals(Compiler.currentNS())) {
+		if (!Compiler.currentNS().equals(v.ns)) {
 			if (sym.ns == null) {
 				v = Compiler.currentNS().intern(sym);
 				Compiler.registerVar(v);
@@ -96,10 +96,18 @@ class DefExprParser implements IParser {
 		if (isDynamic)
 			v.setDynamic();
 		if (!isDynamic && StringTools.startsWith(sym.name, "*") && StringTools.endsWith(sym.name, "*") && sym.name.length > 2) {
-			RT.errPrintWriter()
-				.format("Warning: %1$s not declared dynamic and thus is not dynamically rebindable, "
-					+ "but its name suggests otherwise. Please either indicate ^:dynamic %1$s or change the name. (%2$s:%3$d)\n",
-					sym, Compiler.SOURCE_PATH.get(), Compiler.LINE.get());
+			// RT.errPrintWriter()
+			// 	.format("Warning: %1$s not declared dynamic and thus is not dynamically rebindable, "
+			// 		+ "but its name suggests otherwise. Please either indicate ^:dynamic %1$s or change the name. (%2$s:%3$d)\n",
+			// 		sym, Compiler.SOURCE_PATH.get(), Compiler.LINE.get());
+			RT.errPrintWrite("Warning: "
+				+ sym
+				+ " not declared dynamic and thus is not dynamically rebindable, but its name suggests otherwise. Please either indicate ^:dynamic "
+				+ sym
+				+ " or change the name. ("
+				+ Compiler.SOURCE_PATH.get()
+				+ ":"
+				+ Compiler.LINE.get());
 		}
 		if (RT.booleanCast(RT.get(mm, Compiler.arglistsKey))) {
 			var vm:IPersistentMap = v.meta();

@@ -10,7 +10,7 @@ Clojure port written in [Haxe](https://haxe.org/) targeting C++, HashLink,  Pyth
 *[HashLink](https://hashlink.haxe.org/) is a virtual machine for Haxe [oriented towards real time games](https://haxe.org/blog/shirogames-stack/).
 
 ## Status
-Near all major classes from `clojure.lang.*` have been implemented, ignoring all concurrent primitives and thread-safety (see 'Concurrent primitives' table at the bottom). On the way to work on Compiler and load/compile `clojure.core`.
+Work in progress. Near all major classes from `clojure.lang.*` have been ported, ignoring all concurrent primitives and thread-safety (see 'Concurrent primitives' table at the bottom). On the way to work on Compiler and load/compile `clojure.core`.
 
 ## Current status per platform
 
@@ -28,7 +28,7 @@ Near all major classes from `clojure.lang.*` have been implemented, ignoring all
 
 Tests time are measured with `time <command>` (example `time python3 main.py`)
 
-Pay attention that now only `clojure.lang.*` classes are implemented (and not even all). So after compiling clojure namespaces build sizes will be much bigger (raw prediction ~ x5 or more).
+Pay attention that now only `clojure.lang.*` classes are implemented (and not even all). So after compiling clojure namespaces build sizes will be much bigger.
 
 Build sizes are for builds that run tests.
 

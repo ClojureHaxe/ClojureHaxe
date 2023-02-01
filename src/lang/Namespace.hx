@@ -18,6 +18,10 @@ class Namespace extends AReference {
 		return name.toString();
 	}
 
+	public function equals(o:Any):Bool {
+		return (U.instanceof(o, Namespace) && this.name.equals((o : Namespace).name));
+	}
+
 	public function new(name:Symbol) {
 		super(name.meta());
 		this.name = name;
@@ -192,7 +196,7 @@ class Namespace extends AReference {
 		if (ns != null)
 			return ns;
 		var newns:Namespace = new Namespace(name);
-		//namespaces.set(name, newns);
+		// namespaces.set(name, newns);
 		namespaces = cast namespaces.assoc(name, newns);
 		return newns;
 	}

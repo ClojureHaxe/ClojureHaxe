@@ -5,20 +5,17 @@ import lang.PersistentHashMap;
 // import lang.RT;
 import lang.*;
 
-
 // Initialization order
-// To initialize all static fields in class it is enough to make access to some static field 
+// To initialize all static fields in class it is enough to make access to some static field
 // of that class
 private var init:Bool = {
 	// trace("Static field initialization");
 	PersistentHashMap.BitmapIndexedNode.EMPTY;
 	PersistentHashMap.EMPTY;
-	//trace("PersistentHashMap.EMPTY", PersistentHashMap.EMPTY);
-	//trace(PersistentHashMap.create(1,2));
-	//Namespace.namespaces;	
+	// trace("PersistentHashMap.EMPTY", PersistentHashMap.EMPTY);
+	// trace(PersistentHashMap.create(1,2));
+	// Namespace.namespaces;
 	PersistentList.EMPTY;
-	//PersistentHashMap.EMPTY;
-	//
 	true;
 }
 

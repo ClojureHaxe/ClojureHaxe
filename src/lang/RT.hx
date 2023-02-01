@@ -1,11 +1,12 @@
 package lang;
 
 import lang.Map.EntrySet;
-import haxe.Constraints.IMap;
 import lang.exceptions.IllegalArgumentException;
 import lang.exceptions.IndexOutOfBoundsException;
 import lang.exceptions.NoSuchElementException;
 import lang.exceptions.UnsupportedOperationException;
+import haxe.io.Output;
+import haxe.Constraints.IMap;
 import haxe.ds.Vector;
 import haxe.Exception;
 #if (target.sys)
@@ -39,12 +40,13 @@ class RT {
 	// static public final IN:Var = Var.intern(CLOJURE_NS, Symbol.intern("*in*"), new LineNumberingPushbackReader(new InputStreamReader(System.in))).setDynamic();
 	// static public final ERR:Var = Var.intern(CLOJURE_NS, Symbol.intern("*err*"), new PrintWriter(new OutputStreamWriter(System.err), true)).setDynamic();
 	#if !js
-	static public final OUT:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*out*"), Sys.stdout()).setDynamic();
+	var s = {trace("RT INIT!"); "Hello";}
+	static public final OUT:Var = {trace("OUT INIT", CLOJURE_NS); Var.intern3(CLOJURE_NS, Symbol.intern1("*out*"), Sys.stdout()).setDynamic();}
 	static public final IN:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*in*"), Sys.stdin()).setDynamic();
-	static public final ERR:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*err*"), Sys.stderr()).setDynamic();
+	static public final ERR:Var = {trace("ERR INIT"); Var.intern3(CLOJURE_NS, Symbol.intern1("*err*"), Sys.stderr()).setDynamic();}
 	#end
 	static public final TAG_KEY:Keyword = Keyword.intern(null, "tag");
-	static final CONST_KEY:Keyword = Keyword.intern(null, "const");
+	static public final CONST_KEY:Keyword = Keyword.intern(null, "const");
 	static public final AGENT:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*agent*"), null).setDynamic();
 
 	static var readeval:Any = T; // readTrueFalseUnknown(System.getProperty("clojure.read.eval", "true"));
@@ -82,7 +84,7 @@ class RT {
 	static final PRINT_READABLY:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*print-readably*"), T).setDynamic();
 	static final PRINT_DUP:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*print-dup*"), F).setDynamic();
 	static public final WARN_ON_REFLECTION:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*warn-on-reflection*"), F).setDynamic();
-	static final ALLOW_UNRESOLVED_VARS:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*allow-unresolved-vars*"), F).setDynamic();
+	static public final ALLOW_UNRESOLVED_VARS:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*allow-unresolved-vars*"), F).setDynamic();
 	static public final READER_RESOLVER:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*reader-resolver*"), null).setDynamic();
 
 	static public final IN_NS_VAR:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("in-ns"), F);
@@ -103,14 +105,27 @@ class RT {
 		}
 		return arglist;
 	}*/
-	/*public static PrintWriter errPrintWriter() {
-		Writer w = (Writer) ERR.deref();
-		if (w instanceof PrintWriter) {
-			return (PrintWriter) w;
-		} else {
-			return new PrintWriter(w);
-		}
-	}*/
+	public static function errPrintWrite(msg:String) {
+		/*Writer w = (Writer) ERR.deref();
+			if (w instanceof PrintWriter) {
+				return (PrintWriter) w;
+			} else {
+				return new PrintWriter(w);
+		}*/
+		#if (target.sys)
+		var stderr:Output = ERR.deref();
+		stderr.writeString(msg);
+		#elseif js
+		js.html.Console.error(msg);
+		#end
+	}
+
+	static public function errPrint(s:String) {
+		// TODO;
+		// trace(s);
+	}
+
+
 	static public final EMPTY_ARRAY:Vector<Any> = new Vector<Any>(0);
 	// static public final EMPTY_ARRAY:Array<Any> = new Array<Any>();
 	static public final DEFAULT_COMPARATOR:Comparator = new DefaultComparator();
@@ -386,19 +401,17 @@ class RT {
 		} else if (U.instanceof(o, String)) {
 			return cast(o, String).length;
 		}
-		// TODO:
-		/*
-			} else if (o instanceof CharSequence)
-				return ((CharSequence) o).length();
-			else if (o instanceof Collection)
-				return ((Collection) o).size();
-			else if (o instanceof Map)
-				return ((Map) o).size();
-			else if (o instanceof Map.Entry)
-				return 2;
-			else if (o.getClass().isArray())
-				return Array.getLength(o); */
-
+			// TODO:
+			// else if (o instanceof CharSequence)
+		//	return ((CharSequence) o).length();
+		else if (U.instanceof(o, Collection))
+			return (o : Collection).size();
+			// else if (o instanceof Map)
+		//	return ((Map) o).size();
+		else if (U.instanceof(o, IMapEntry))
+			return 2;
+		// else if (o.getClass().isArray())
+		//	return Array.getLength(o);
 		return 0;
 
 		// throw new UnsupportedOperationException("count not supported on this type: " + o.getClass().getSimpleName());
@@ -684,11 +697,6 @@ class RT {
 	}
 
 	/* ********************************************** Boxing/casts ****************************************************  */
-	static public function errPrint(s:String) {
-		// TODO;
-		// trace(s);
-	}
-
 	static public function map(...init:Any):IPersistentMap {
 		if (init == null || init.length == 0)
 			return PersistentArrayMap.EMPTY;

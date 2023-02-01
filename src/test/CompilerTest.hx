@@ -7,6 +7,7 @@ import lang.Keyword;
 import lang.Util;
 import lang.PersistentVector;
 import lang.U;
+import lang.RT;
 import utest.Test;
 import utest.Assert;
 
@@ -38,21 +39,31 @@ class CompilerTest extends Test {
 		// set
 		Assert.isTrue(Util.equals(PersistentHashSet.create(1, 2, 3), readEval("#{1,2,3}")));
 
+		// Empty
+		Assert.isTrue(Util.equals(PersistentVector.EMPTY, readEval("[]")));
+
 		trace("============================== CompilerTests ==========================");
-		// var set1:PersistentHashSet = PersistentHashSet.create(1, 2, 3);
-		// var set2:PersistentHashSet = PersistentHashSet.create(1, 2, 3);
-		// trace(">>>>>>>> SET: " + set1 + " " + set2 + "  " + Util.equals(set1, set2));
-		// var readedSet:Any = readEval("#{1,2,3}");
-		// trace("ReaderSet: " + readedSet);
+		// trace(readEval("(let* [a 1] a)"));
+		// trace(readEval("(def a 10) a"));
 
 		// var s:String = "(do 1 2 {:a 1 :b 2 :c [1 2 3]})";
 		// trace(readEval(s));
 		// var k:Any = true;
-		//  var k1:Any = 1;
-		//  var k2:Any = 2;
-		//  trace("Equality:", (k1 == true), (true == k1), (k2 == true), (true == k2));
-		//  trace("Equality bool", Type.typeof(1), Type.typeof(2), Type.typeof(true), Type.typeof(false));
+		// var k1:Any = 1;
+		// var k2:Any = 2;
+		// trace("Equality:", (k1 == true), (true == k1), (k2 == true), (true == k2));
+		// trace("Equality bool", Type.typeof(1), Type.typeof(2), Type.typeof(true), Type.typeof(false));
+		// RT.errPrintWrite("HELLO ERROR");
+	}
 
-		// trace(U.getClassName(readEval(":keyword")));
+	public function testIfExpr() {
+		Assert.equals(2, readEval("(if 1 2 3)"));
+		Assert.equals(3, readEval("(if nil 2 3)"));
+		Assert.equals(3, readEval("(if false 2 3)"));
+		Assert.isTrue(Keyword.create1("key").equals(readEval("(if true :key 3)")));
+	}
+
+	public function testDefExpr() {
+		Assert.equals(10, readEval("(def a 10) a"));
 	}
 }

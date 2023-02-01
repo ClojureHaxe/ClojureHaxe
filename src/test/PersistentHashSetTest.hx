@@ -31,5 +31,10 @@ class PersistentHashSetTest extends Test {
 		Assert.equals(true, hs.get(true));
 		Assert.equals(false, hs.get(false));
 		Assert.isTrue(Util.equiv(PersistentHashSet.create(null, "a", true, "b", "c", "d", "e", false, 10), hs));
+
+		// equality
+		var set1:PersistentHashSet = PersistentHashSet.create(1, 2, 3);
+		var set2:PersistentHashSet = PersistentHashSet.create(1, 2, 3);
+		Assert.isTrue(set1.equals(set2));
 	}
 }

@@ -1,6 +1,5 @@
 package lang;
 
-import lang.misc.Thread;
 import haxe.Exception;
 import lang.exceptions.IllegalArgumentException;
 import lang.exceptions.IllegalStateException;
@@ -81,30 +80,30 @@ class Compiler {
 	static public final NS:Symbol = Symbol.internNSname("ns");
 	static public final IN_NS:Symbol = Symbol.internNSname("in-ns");
 
-	static public final specials:IPersistentMap = PersistentHashMap.create( // DEF, new DefExpr.DefExprParser(),
+	static public final specials:IPersistentMap = PersistentHashMap.create( //
+		DEF, new DefExpr.DefExprParser(), //
 		// LOOP, new LetExpr.Parser(),
 		// RECUR, new RecurExpr.Parser(),
-		/*	IF, new IfExpr.Parser(),
-			CASE, new CaseExpr.Parser(),
-			LET, new LetExpr.Parser(),
-			LETFN, new LetFnExpr.Parser(),
-			DO, new BodyExpr.Parser(),
-			FN, null,
-			QUOTE, new ConstantExpr.Parser(),
-			THE_VAR, new TheVarExpr.Parser(),
-			IMPORT, new ImportExpr.Parser(),
-			DOT, new HostExpr.Parser(),
-			ASSIGN, new AssignExpr.Parser(),
-			DEFTYPE, new NewInstanceExpr.DeftypeParser(),
-			REIFY, new NewInstanceExpr.ReifyParser(),
-			TRY, new TryExpr.Parser(),
-			THROW, new ThrowExpr.Parser(),
-			MONITOR_ENTER, new MonitorEnterExpr.Parser(),
-			MONITOR_EXIT, new MonitorExitExpr.Parser(),
-			CATCH, null,
-			FINALLY, null,
-			NEW, new NewExpr.Parser(),
-		 */
+		IF, new IfExpr.IfExprParser(), //
+		// CASE, new CaseExpr.Parser(),
+		LET, new LetExpr.LetExprParser(), //
+		// LETFN, new LetFnExpr.Parser(),
+		// DO, new BodyExpr.Parser(),
+		// FN, null,
+		// QUOTE, new ConstantExpr.Parser(),
+		// THE_VAR, new TheVarExpr.Parser(),
+		// IMPORT, new ImportExpr.Parser(),
+		// DOT, new HostExpr.Parser(),
+		// ASSIGN, new AssignExpr.Parser(),
+		// DEFTYPE, new NewInstanceExpr.DeftypeParser(),
+		// REIFY, new NewInstanceExpr.ReifyParser(),
+		// TRY, new TryExpr.Parser(),
+		// THROW, new ThrowExpr.Parser(),
+		// MONITOR_ENTER, new MonitorEnterExpr.Parser(),
+		// MONITOR_EXIT, new MonitorExitExpr.Parser(),
+		// CATCH, null,
+		// FINALLY, null,
+		// NEW, new NewExpr.Parser(),
 		_AMP_, null);
 
 	private static final MAX_POSITIONAL_ARITY:Int = 20;
@@ -155,10 +154,23 @@ class Compiler {
 	static public final directLinkingKey:Keyword = Keyword.intern1("direct-linking");
 	static public final elideMetaKey:Keyword = Keyword.intern1("elide-meta");
 
-	static public var COMPILER_OPTIONS:Var;
+	// TODO: read system props from env?
+	static public var COMPILER_OPTIONS:Var = Var.intern3(Namespace.findOrCreate(Symbol.intern1("clojure.core")), Symbol.intern1("*compiler-options*"),
+		PersistentArrayMap.EMPTY)
+		.setDynamic();
 
 	static public function getCompilerOption(k:Keyword):Any {
 		return RT.get(COMPILER_OPTIONS.deref(), k);
+	}
+
+	static public function elideMeta(m:Any) {
+		var elides:Any = getCompilerOption(elideMetaKey);
+		if (elides != null) {
+			for (k in U.getIterator(elides)) {
+				m = RT.dissoc(m, k);
+			}
+		}
+		return m;
 	}
 
 	// Integer
@@ -197,15 +209,9 @@ class Compiler {
 	// LocalBinding -> Set<LocalBindingExpr>
 	static public final CLEAR_SITES:Var = Var.create1(null).setDynamic();
 
-	static public function currentNS():Namespace {
-		return RT.CURRENT_NS.deref();
-	}
-
 	// 370
 	static public function isSpecial(sym:Any):Bool {
-		// TODO:
-		// return specials.containsKey(sym);
-		return false;
+		return specials.containsKey(sym);
 	}
 
 	// 374
@@ -221,6 +227,60 @@ class Compiler {
 	static public final FALSE_EXPR:BooleanExpr = new BooleanExpr(false);
 
 	// ====================================================================================================
+	// Munge
+	// ====================================================================================================
+	static public final CHAR_MAP:IPersistentMap = PersistentHashMap.create( //
+		'-', "_", //
+		':', "_COLON_", //
+		'+', "_PLUS_", //
+		'>', "_GT_", //
+		'<', "_LT_", //
+		'=', "_EQ_", //
+		'~', "_TILDE_", //
+		'!', "_BANG_", //
+		'@', "_CIRCA_", //
+		'#', "_SHARP_", //
+		'\'', "_SINGLEQUOTE_", //
+		'"', "_DOUBLEQUOTE_", //
+		'%', "_PERCENT_", //
+		'^', "_CARET_", //
+		'&', "_AMPERSAND_", //
+		'*', "_STAR_", //
+		'|', "_BAR_", //
+		'{', "_LBRACE_", //
+		'}', "_RBRACE_", //
+		'[', "_LBRACK_", //
+		']', "_RBRACK_", //
+		'/', "_SLASH_", //
+		'\\', "_BSLASH_", //
+		'?',
+		"_QMARK_");
+
+	// static  public final  DEMUNGE_MAP:IPersistentMap;
+	// static  public final Pattern DEMUNGE_PATTERN;
+
+	static public function munge(name:String):String {
+		var sb:StringBuf = new StringBuf();
+		var i:Int = 0;
+		while (i < name.length) {
+			var c:String = name.charAt(i);
+			var sub:String = CHAR_MAP.valAt(c);
+			if (sub != null)
+				sb.add(sub);
+			else
+				sb.add(c);
+			i++;
+		}
+		return sb.toString();
+	}
+
+	// ====================================================================================================
+	// END Munge
+	// ====================================================================================================
+
+	static function clearPathRoot():PathNode {
+		return CLEAR_ROOT.get();
+	}
 
 	static public function maybeResolveIn(n:Namespace, sym:Symbol):Any {
 		// note - ns-qualified vars must already exist
@@ -279,6 +339,14 @@ class Compiler {
 		return sym.ns != null && namespaceFor(sym) == null;
 	}
 
+	static public function resolve2(sym:Symbol, allowPrivate:Bool):Any {
+		return resolveIn(currentNS(), sym, allowPrivate);
+	}
+
+	static public function resolve(sym:Symbol):Any {
+		return resolveIn(currentNS(), sym, false);
+	}
+
 	static public function namespaceFor(sym:Symbol):Namespace {
 		return namespaceFor2(currentNS(), sym);
 	}
@@ -290,6 +358,60 @@ class Compiler {
 			ns = Namespace.find(nsSym);
 		}
 		return ns;
+	}
+
+	static public function resolveIn(n:Namespace, sym:Symbol, allowPrivate:Bool):Any {
+		// note - ns-qualified vars must already exist
+		if (sym.ns != null) {
+			var ns:Namespace = namespaceFor2(n, sym);
+			if (ns == null)
+				throw Util.runtimeException("No such namespace: " + sym.ns);
+
+			var v:Var = ns.findInternedVar(Symbol.intern1(sym.name));
+			if (v == null)
+				throw Util.runtimeException("No such var: " + sym);
+			else if (v.ns != currentNS() && !v.isPublic() && !allowPrivate)
+				throw new IllegalStateException("var: " + sym + " is not public");
+			return v;
+		} else if (sym.name.indexOf('.') > 0 || sym.name.charAt(0) == '[') {
+			return RT.classForName(sym.name);
+		} else if (sym.equals(NS))
+			return RT.NS_VAR;
+		else if (sym.equals(IN_NS))
+			return RT.IN_NS_VAR;
+		else {
+			if (Util.equals(sym, COMPILE_STUB_SYM.get()))
+				return COMPILE_STUB_CLASS.get();
+			var o:Any = n.getMapping(sym);
+			if (o == null) {
+				if (RT.booleanCast(RT.ALLOW_UNRESOLVED_VARS.deref())) {
+					return sym;
+				} else {
+					throw Util.runtimeException("Unable to resolve symbol: " + sym + " in this context");
+				}
+			}
+			return o;
+		}
+	}
+
+	public static function registerLocal(sym:Symbol, tag:Symbol, init:Expr, isArg:Bool):LocalBinding {
+		var num:Int = getAndIncLocalNum();
+		var b:LocalBinding = new LocalBinding(num, sym, tag, init, isArg, clearPathRoot());
+		var localsMap:IPersistentMap = LOCAL_ENV.deref();
+		LOCAL_ENV.set(RT.assoc(localsMap, b.sym, b));
+		var method:ObjMethod = METHOD.deref();
+		method.locals = cast RT.assoc(method.locals, b, b);
+		method.indexlocals = cast RT.assoc(method.indexlocals, num, b);
+		return b;
+	}
+
+	private static function getAndIncLocalNum():Int {
+		var num:Int = NEXT_LOCAL_NUM.deref();
+		var m:ObjMethod = METHOD.deref();
+		if (num > m.maxLocal)
+			m.maxLocal = num;
+		NEXT_LOCAL_NUM.set(num + 1);
+		return num;
 	}
 
 	// 6200
@@ -312,8 +434,8 @@ class Compiler {
 				return TRUE_EXPR;
 			else if (RT.F == form #if (cpp || python) && U.isBool(form) #end) // isBool check only for CPP and Python  cause 1 == true
 				return FALSE_EXPR;
-				// if (U.instanceof(form, Symbol))
-			//	return analyzeSymbol(form);
+			if (U.instanceof(form, Symbol))
+				return analyzeSymbol(form);
 			else if (U.instanceof(form, Keyword))
 				return registerKeyword(form);
 			else if (U.isNumber(form))
@@ -328,9 +450,8 @@ class Compiler {
 				if (RT.meta(form) != null)
 					ret = new MetaExpr(ret, MapExpr.parse(context == C.EVAL ? context : C.EXPRESSION, cast(form, IObj).meta()));
 				return ret;
-			}
-				// else if (U.instanceof(form, ISeq))
-			//	return analyzeSeq(context, form, name);
+			} else if (U.instanceof(form, ISeq))
+				return analyzeSeq(context, form, name);
 			else if (U.instanceof(form, IPersistentVector))
 				return VectorExpr.parse(context, form);
 			else if (U.instanceof(form, IRecord))
@@ -348,6 +469,21 @@ class Compiler {
 			else
 				throw e;
 		}
+	}
+
+	static public function isMacro(op:Any):Var {
+		// no local macros for now
+		if (U.instanceof(op, Symbol) && referenceLocal(op) != null)
+			return null;
+		if (U.instanceof(op, Symbol) || U.instanceof(op, Var)) {
+			var v:Var = (U.instanceof(op, Var)) ? op : lookupVar3(op, false, false);
+			if (v != null && v.isMacro()) {
+				if (v.ns != currentNS() && !v.isPublic())
+					throw new IllegalStateException("var: " + v + " is not public");
+				return v;
+			}
+		}
+		return null;
 	}
 
 	// 6384
@@ -444,6 +580,7 @@ class Compiler {
 
 	// 6506
 	private static function analyzeSeq(context:C, form:ISeq, name:String):Expr {
+		trace(">>>>>>>>>>>> analyzeSeq: " + context + " " + form);
 		var line:Any = lineDeref();
 		var column:Any = columnDeref();
 		if (RT.meta(form) != null && RT.meta(form).containsKey(RT.LINE_KEY))
@@ -471,9 +608,10 @@ class Compiler {
 					// if (FN.equals(op))
 					//	FnExpr.parse(context, form, name);
 					// else
-					if ((p = specials.valAt(op)) != null)
-						p.parse(context, form);
-
+					trace("Check specials: " + op);
+					if ((p = specials.valAt(op)) != null) {
+						return p.parse(context, form);
+					}
 					// TOOD:
 					// else
 					//	InvokeExpr.parse(context, form);
@@ -602,6 +740,153 @@ class Compiler {
 		return new KeywordExpr(keyword);
 	}
 
+	// 6667
+	static function fwdPath(p1:PathNode):ISeq {
+		var ret:ISeq = null;
+		while (p1 != null) {
+			ret = RT.cons(p1, ret);
+			p1 = p1.parent;
+		}
+		return ret;
+	}
+
+	static public function commonPath(n1:PathNode, n2:PathNode):PathNode {
+		var xp:ISeq = fwdPath(n1);
+		var yp:ISeq = fwdPath(n2);
+		if (RT.first(xp) != RT.first(yp))
+			return null;
+		while (RT.second(xp) != null && RT.second(xp) == RT.second(yp)) {
+			xp = xp.next();
+			yp = yp.next();
+		}
+		return RT.first(xp);
+	}
+
+	private static function analyzeSymbol(sym:Symbol):Expr {
+		trace("Analyze symbol: " + sym);
+		var tag:Symbol = tagOf(sym);
+		if (sym.ns == null) // ns-qualified syms are always Vars
+		{
+			var b:LocalBinding = referenceLocal(sym);
+			if (b != null) {
+				return new LocalBindingExpr(b, tag);
+			}
+		}
+		/*else {
+			if (namespaceFor(sym) == null) {
+				var nsSym:Symbol = Symbol.intern1(sym.ns);
+				Class c = HostExpr.maybeClass(nsSym, false);
+				if (c != null) {
+					if (Reflector.getField(c, sym.name, true) != null)
+						return new StaticFieldExpr(lineDeref(), columnDeref(), c, sym.name, tag);
+					throw Util.runtimeException("Unable to find static field: " + sym.name + " in " + c);
+				}
+			}
+		}*/
+		var o:Any = resolve(sym);
+		trace("RESOVLE: " + o + " " + RT.booleanCast(RT.get((o : Var).meta(), RT.CONST_KEY)));
+		if (U.instanceof(o, Var)) {
+			var v:Var = o;
+			if (isMacro(v) != null)
+				throw Util.runtimeException("Can't take value of a macro: " + v);
+			if (RT.booleanCast(RT.get(v.meta(), RT.CONST_KEY)))
+				return analyze(C.EXPRESSION, RT.list(QUOTE, v.get()));
+			registerVar(v);
+			return new VarExpr(v, tag);
+		} else if (U.instanceof(o, Class))
+			return new ConstantExpr(o);
+		else if (U.instanceof(o, Symbol))
+			return new UnresolvedVarExpr(o);
+
+		throw Util.runtimeException("Unable to resolve symbol: " + sym + " in this context");
+	}
+
+	static public function lookupVar3(sym:Symbol, internNew:Bool, registerMacro:Bool):Var {
+		var varr:Var = null;
+		// note - ns-qualified vars in other namespaces must already exist
+		if (sym.ns != null) {
+			var ns:Namespace = namespaceFor(sym);
+			if (ns == null)
+				return null;
+			// throw Util.runtimeException("No such namespace: " + sym.ns);
+			var name:Symbol = Symbol.intern1(sym.name);
+			if (internNew && ns == currentNS())
+				varr = currentNS().intern(name);
+			else
+				varr = ns.findInternedVar(name);
+		} else if (sym.equals(NS))
+			varr = RT.NS_VAR;
+		else if (sym.equals(IN_NS))
+			varr = RT.IN_NS_VAR;
+		else {
+			// is it mapped?
+			var o:Any = currentNS().getMapping(sym);
+			if (o == null) {
+				// introduce a new var in the current ns
+				if (internNew)
+					varr = currentNS().intern(Symbol.intern1(sym.name));
+			} else if (U.instanceof(o, Var)) {
+				varr = o;
+			} else {
+				throw Util.runtimeException("Expecting var, but " + sym + " is mapped to " + o);
+			}
+		}
+		if (varr != null && (!varr.isMacro() || registerMacro))
+			registerVar(varr);
+		return varr;
+	}
+
+	static public function lookupVar(sym:Symbol, internNew:Bool):Var {
+		return lookupVar3(sym, internNew, true);
+	}
+
+	// 6881
+	public static function registerVar(varr:Var) {
+		if (!VARS.isBound())
+			return;
+		var varsMap:IPersistentMap = VARS.deref();
+		var id:Any = RT.get(varsMap, varr);
+		if (id == null) {
+			VARS.set(RT.assoc(varsMap, varr, registerConstant(varr)));
+		}
+		// trace(">>>>>>>>>>>> REGISTER VARS: " +  VARS);
+	}
+
+	static public function currentNS():Namespace {
+		return RT.CURRENT_NS.deref();
+	}
+
+	/*
+		static public function closeOver( b:LocalBinding,  method:ObjMethod) {
+			if (b != null && method != null) {
+				var lb:LocalBinding =  RT.get(method.locals, b);
+				if (lb == null) {
+					method.objx.closes = RT.assoc(method.objx.closes, b, b);
+					closeOver(b, method.parent);
+				} else {
+					if (lb.idx == 0)
+						method.usesThis = true;
+					if (IN_CATCH_FINALLY.deref() != null) {
+						method.localsUsedInCatchFinally = (PersistentHashSet) method.localsUsedInCatchFinally.cons(b.idx);
+					}
+				}
+			}
+		}
+	 */
+	static private function referenceLocal(sym:Symbol):LocalBinding {
+		if (!LOCAL_ENV.isBound())
+			return null;
+		var b:LocalBinding = RT.get(LOCAL_ENV.deref(), sym);
+		if (b != null) {
+			var method:ObjMethod = METHOD.deref();
+			if (b.idx == 0)
+				method.usesThis = true;
+			// TODO: CLOSE OVER!
+			// closeOver(b, method);
+		}
+		return b;
+	}
+
 	// 6927
 	public static function tagOf(o:Any):Symbol {
 		var tag:Any = RT.get(RT.meta(o), RT.TAG_KEY);
@@ -625,7 +910,6 @@ class Compiler {
 			RT.CURRENT_NS.deref(), LINE_BEFORE, pushbackReader.getLineNumber(), COLUMN_BEFORE, pushbackReader.getColumnNumber(), LINE_AFTER,
 			pushbackReader.getLineNumber(), COLUMN_AFTER, pushbackReader.getColumnNumber(), RT.UNCHECKED_MATH, RT.UNCHECKED_MATH.deref(),
 			RT.WARN_ON_REFLECTION, RT.WARN_ON_REFLECTION.deref(), RT.DATA_READERS, RT.DATA_READERS.deref()));
-		trace("Before cycle");
 		var readerOpts:Any = readerOpts(sourceName);
 		trace("Before cycle, readerOpts: " + readerOpts);
 		try {
@@ -633,10 +917,7 @@ class Compiler {
 			trace(">>>>> LOAD READ: " + r);
 			while (r != EOF) {
 				consumeWhitespaces(pushbackReader);
-				trace("SET LINE_AFTER", Thread.currentThread() == Thread.currentThread());
-				trace("SET THREAD EQ: " + Thread.equals(Thread.currentThread(), Thread.currentThread()));
 				LINE_AFTER.set(pushbackReader.getLineNumber());
-				trace("SET COLUMN_AFTER");
 				COLUMN_AFTER.set(pushbackReader.getColumnNumber());
 				ret = eval2(r, false);
 				trace("EVAL RET: " + ret);
