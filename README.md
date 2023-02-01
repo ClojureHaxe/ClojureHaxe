@@ -1,6 +1,6 @@
 # ClojureHaxe
 
-Experemental Clojure port written in [Haxe](https://haxe.org/) targeting C++, HashLink,  Python, Lua, JavaScript, JVM/Java, C#.
+Experimental Clojure port written in [Haxe](https://haxe.org/) targeting C++, HashLink,  Python, Lua, JavaScript, JVM/Java, C#.
 
 ## Targets priority
 1. C++, HashLink, Python, Lua
