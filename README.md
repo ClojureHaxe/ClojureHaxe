@@ -1,6 +1,6 @@
 # ClojureHaxe
 
-Clojure port written in [Haxe](https://haxe.org/) targeting C++, HashLink,  Python, Lua, JavaScript, JVM/Java, C#.
+Expiremental Clojure port written in [Haxe](https://haxe.org/) targeting C++, HashLink,  Python, Lua, JavaScript, JVM/Java, C#.
 
 ## Targets priority
 1. C++, HashLink, Python, Lua
@@ -16,12 +16,12 @@ Work in progress. Near all major classes from `clojure.lang.*` have been ported,
 
 | Platform | Build size | Tests | Tests time | Comment |
 |---| ---| ---|  ---|  ---|
-| C++ | 5.5 MB |  157/157 (ALL) | 0,009s |
-| HashLink | 302 KB  | 157/157 (ALL) | 0,040s |
-| Python | 708 KB  | 157/157 (ALL) | 0,458s |
-| Lua | 788 KB | 156/157 |  0,117s | Due to [#10909](https://github.com/HaxeFoundation/haxe/issues/10909) |
-| JavaScript | 512 KB | 157/157  (ALL) | 0,196s | Not optimized `.js` file
-| Java | 516 KB | 149/153 | 0,426s | Due to [#10906](https://github.com/HaxeFoundation/haxe/issues/10906) |
+| C++ | 6.1 MB |  198/198 (ALL) | 0,018s |
+| HashLink | 348 KB  | 198/198 (ALL) | 0,075s |
+| Python | 812 KB  | 198/198 (ALL) | 1,368s |
+| Lua | 916.5 KB | 197/198 |  0,870s | Due to [#10909](https://github.com/HaxeFoundation/haxe/issues/10909) |
+| JavaScript | 512 KB | 157/157 | 0,196s | Previous results
+| Java | 603.5 KB | 192/194 | 0,426s | Due to [#10906](https://github.com/HaxeFoundation/haxe/issues/10906) |
 | C# | | | | Not compiled because of double methods generation  |
 | PHP |  || | Not tested
 | Flash | | | | Not tested
@@ -32,16 +32,17 @@ Pay attention that now only `clojure.lang.*` classes are implemented (and not ev
 
 Build sizes are for builds that run tests.
 
-In Java and Lua there are some bugs in `haxe.Rest` for now, but I think it is possible to avoid them or they will be fixed in feature Haxe realeases.
+In Java and Lua there are some bugs in `haxe.Rest`, but I think it is possible to avoid them or they will be fixed in feature Haxe realeases.
+
+Because this port is based on Clojure JVM implementation, which uses some system features (for example filesystem in clojure.lang.RT), for JavaScript it needs some other implementations in those places and more [conditional compilation](https://haxe.org/manual/lf-condition-compilation.html). And because JS is not in 1 priority, I decided to postpone it for later.
 
 C# target is not built probably because of complex hierarchy and methods with same names in base class/interface and sublclasses/subinterfaces. Needs more investigating.
 
 ## Near future goals
 
 * Be able to run base, general, single-threaded version of Clojure REPL as interpreter (without full support for concurrency and parallelism for now) on various platforms
-* Discover all posibilities that this will bring (and continue to work on parallelism and concurrency, dive in target specific features and iterop)
+* Discover all posibilities that this will bring
 * Have fun
-
 
 
 ## Concurrent primitives (for future)
