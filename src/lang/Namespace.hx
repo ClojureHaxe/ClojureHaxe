@@ -42,7 +42,7 @@ class Namespace extends AReference {
 	}
 
 	private function isInternedMapping(sym:Symbol, o:Any):Bool {
-		return (U.instanceof(o, Var) && cast(o, Var).ns == this && cast(o, Var).sym.equals(sym));
+		return (U.instanceof(o, Var) && (o : Var).ns == this && (o : Var).sym.equals(sym));
 	}
 
 	public function intern(sym:Symbol):Var {
@@ -54,13 +54,13 @@ class Namespace extends AReference {
 		var o:Any;
 		var v:Var = null;
 
-		if ((o = map.valAt(sym)) == null) {
+		while ((o = map.valAt(sym)) == null) {
 			if (v == null) {
 				v = new Var(this, sym);
 			}
 			mappings = cast mappings.assoc(sym, v);
+			map = mappings;
 		}
-
 		/*while ((o = map.valAt(sym)) == null) {
 			if (v == null)
 				v = new Var(this, sym);
@@ -99,17 +99,17 @@ class Namespace extends AReference {
 	private function checkReplacement(sym:Symbol, old:Any, neu:Any):Bool {
 		if (U.instanceof(old, Var)) {
 			var ons:Namespace = cast(old, Var).ns;
-			var nns:Namespace = U.instanceof(neu, Var) ? cast(neu, Var).ns : null;
+			var nns:Namespace = U.instanceof(neu, Var) ? (neu : Var).ns : null;
 
 			if (isInternedMapping(sym, old)) {
 				if (nns != RT.CLOJURE_NS) {
-					RT.errPrint("REJECTED: attempt to replace interned var " + old + " with " + neu + " in " + name + ", you must ns-unmap first");
+					RT.errPrintWrite("REJECTED: attempt to replace interned var " + old + " with " + neu + " in " + name + ", you must ns-unmap first");
 					return false;
 				} else
 					return false;
 			}
 		}
-		RT.errPrint("WARNING: " + sym + " already refers to: " + old + " in namespace: " + name + ", being replaced by: " + neu);
+		RT.errPrintWrite("WARNING: " + sym + " already refers to: " + old + " in namespace: " + name + ", being replaced by: " + neu);
 		return true;
 	}
 

@@ -40,10 +40,9 @@ class RT {
 	// static public final IN:Var = Var.intern(CLOJURE_NS, Symbol.intern("*in*"), new LineNumberingPushbackReader(new InputStreamReader(System.in))).setDynamic();
 	// static public final ERR:Var = Var.intern(CLOJURE_NS, Symbol.intern("*err*"), new PrintWriter(new OutputStreamWriter(System.err), true)).setDynamic();
 	#if !js
-	var s = {trace("RT INIT!"); "Hello";}
-	static public final OUT:Var = {trace("OUT INIT", CLOJURE_NS); Var.intern3(CLOJURE_NS, Symbol.intern1("*out*"), Sys.stdout()).setDynamic();}
+	static public final OUT:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*out*"), Sys.stdout()).setDynamic();
 	static public final IN:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*in*"), Sys.stdin()).setDynamic();
-	static public final ERR:Var = {trace("ERR INIT"); Var.intern3(CLOJURE_NS, Symbol.intern1("*err*"), Sys.stderr()).setDynamic();}
+	static public final ERR:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*err*"), Sys.stderr()).setDynamic();
 	#end
 	static public final TAG_KEY:Keyword = Keyword.intern(null, "tag");
 	static public final CONST_KEY:Keyword = Keyword.intern(null, "const");
@@ -114,7 +113,8 @@ class RT {
 		}*/
 		#if (target.sys)
 		var stderr:Output = ERR.deref();
-		stderr.writeString(msg);
+		stderr.writeString(msg+ "\n");
+		stderr.flush();
 		#elseif js
 		js.html.Console.error(msg);
 		#end
