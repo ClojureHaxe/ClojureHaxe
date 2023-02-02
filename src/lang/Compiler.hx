@@ -82,8 +82,7 @@ class Compiler {
 
 	static public final specials:IPersistentMap = PersistentHashMap.create( //
 		DEF, new DefExpr.DefExprParser(), //
-		// LOOP, new LetExpr.Parser(),
-		// RECUR, new RecurExpr.Parser(),
+		//LOOP, new LetExpr.LetExprParser(), // RECUR, new RecurExpr.Parser(),
 		IF, new IfExpr.IfExprParser(), //
 		// CASE, new CaseExpr.Parser(),
 		LET, new LetExpr.LetExprParser(), //
@@ -215,7 +214,7 @@ class Compiler {
 	}
 
 	// 374
-	static function inTailCall(context:C):Bool {
+	static public function inTailCall(context:C):Bool {
 		return (context == C.RETURN) && (METHOD_RETURN_CONTEXT.deref() != null) && (IN_CATCH_FINALLY.deref() == null);
 	}
 

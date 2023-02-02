@@ -24,16 +24,16 @@ class RT {
 	static public final UTF8 = "UTF-8";
 
 	static function readTrueFalseUnknown(s:String):Any {
-		if (s == ("true"))
+		if (s == "true")
 			return T;
-		else if (s == ("false"))
+		else if (s == "false")
 			return F;
 		return Keyword.intern(null, "unknown");
 	}
 
 	// TODO: fix object for that
 	static public final REQUIRE_LOCK:Any = Symbol.intern1("REQUIRE_LOCK");
-	static public final CLOJURE_NS:Namespace = Namespace.findOrCreate(Symbol.internNSname("clojure.core"));
+	static public final CLOJURE_NS:Namespace = Namespace.findOrCreate(Symbol.intern1("clojure.core"));
 
 	// TODO: reader/wirter instead of stdin, stderr, stdout
 	// static public final OUT:Var = Var.intern(CLOJURE_NS, Symbol.intern("*out*"), new OutputStreamWriter(System.out)).setDynamic();
@@ -46,16 +46,16 @@ class RT {
 	#end
 	static public final TAG_KEY:Keyword = Keyword.intern(null, "tag");
 	static public final CONST_KEY:Keyword = Keyword.intern(null, "const");
-	static public final AGENT:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*agent*"), null).setDynamic();
+	static public final AGENT:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*agent*"), null).setDynamic();
 
 	static var readeval:Any = T; // readTrueFalseUnknown(System.getProperty("clojure.read.eval", "true"));
-	static public final READEVAL:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*read-eval*"), readeval).setDynamic();
-	static public final DATA_READERS:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*data-readers*"), RT.map()).setDynamic();
-	static public final DEFAULT_DATA_READER_FN:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*default-data-reader-fn*"), RT.map()).setDynamic();
-	static public final DEFAULT_DATA_READERS:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("default-data-readers"), RT.map());
-	static public final SUPPRESS_READ:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*suppress-read*"), null).setDynamic();
-	static public final ASSERT:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*assert*"), T).setDynamic();
-	static public final MATH_CONTEXT:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*math-context*"), null).setDynamic();
+	static public final READEVAL:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*read-eval*"), readeval).setDynamic();
+	static public final DATA_READERS:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*data-readers*"), RT.map()).setDynamic();
+	static public final DEFAULT_DATA_READER_FN:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*default-data-reader-fn*"), RT.map()).setDynamic();
+	static public final DEFAULT_DATA_READERS:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("default-data-readers"), RT.map());
+	static public final SUPPRESS_READ:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*suppress-read*"), null).setDynamic();
+	static public final ASSERT:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*assert*"), T).setDynamic();
+	static public final MATH_CONTEXT:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*math-context*"), null).setDynamic();
 
 	static public final EVAL_FILE_KEY:Keyword = Keyword.intern("clojure.core", "eval-file");
 	static public final LINE_KEY:Keyword = Keyword.intern(null, "line");
@@ -64,33 +64,32 @@ class RT {
 	static public var DECLARED_KEY:Keyword = Keyword.intern(null, "declared");
 	static public var DOC_KEY:Keyword = Keyword.intern(null, "doc");
 
-	static public final USE_CONTEXT_CLASSLOADER:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*use-context-classloader*"), T).setDynamic();
+	static public final USE_CONTEXT_CLASSLOADER:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*use-context-classloader*"), T).setDynamic();
 
-	static public final UNCHECKED_MATH:Var = Var.intern3(Namespace.findOrCreate(Symbol.internNSname("clojure.core")), Symbol.internNSname("*unchecked-math*"),
-		false)
+	static public final UNCHECKED_MATH:Var = Var.intern3(Namespace.findOrCreate(Symbol.intern1("clojure.core")), Symbol.intern1("*unchecked-math*"), false)
 		.setDynamic();
 
-	static final LOAD_FILE:Symbol = Symbol.internNSname("load-file");
-	static final IN_NAMESPACE:Symbol = Symbol.internNSname("in-ns");
-	static final NAMESPACE:Symbol = Symbol.internNSname("ns");
-	static final IDENTICAL:Symbol = Symbol.internNSname("identical?");
-	static final CMD_LINE_ARGS:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*command-line-args*"), null).setDynamic();
+	static final LOAD_FILE:Symbol = Symbol.intern1("load-file");
+	static final IN_NAMESPACE:Symbol = Symbol.intern1("in-ns");
+	static final NAMESPACE:Symbol = Symbol.intern1("ns");
+	static final IDENTICAL:Symbol = Symbol.intern1("identical?");
+	static final CMD_LINE_ARGS:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*command-line-args*"), null).setDynamic();
 	// symbol
-	public static final CURRENT_NS:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*ns*"), CLOJURE_NS).setDynamic();
+	public static final CURRENT_NS:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*ns*"), CLOJURE_NS).setDynamic();
 
-	static final FLUSH_ON_NEWLINE:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*flush-on-newline*"), T).setDynamic();
-	static final PRINT_META:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*print-meta*"), F).setDynamic();
-	static final PRINT_READABLY:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*print-readably*"), T).setDynamic();
-	static final PRINT_DUP:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*print-dup*"), F).setDynamic();
-	static public final WARN_ON_REFLECTION:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*warn-on-reflection*"), F).setDynamic();
-	static public final ALLOW_UNRESOLVED_VARS:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*allow-unresolved-vars*"), F).setDynamic();
-	static public final READER_RESOLVER:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*reader-resolver*"), null).setDynamic();
+	static final FLUSH_ON_NEWLINE:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*flush-on-newline*"), T).setDynamic();
+	static final PRINT_META:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*print-meta*"), F).setDynamic();
+	static final PRINT_READABLY:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*print-readably*"), T).setDynamic();
+	static final PRINT_DUP:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*print-dup*"), F).setDynamic();
+	static public final WARN_ON_REFLECTION:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*warn-on-reflection*"), F).setDynamic();
+	static public final ALLOW_UNRESOLVED_VARS:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*allow-unresolved-vars*"), F).setDynamic();
+	static public final READER_RESOLVER:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*reader-resolver*"), null).setDynamic();
 
-	static public final IN_NS_VAR:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("in-ns"), F);
-	static public final NS_VAR:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("ns"), F);
-	static public final FN_LOADER_VAR:Var = Var.intern3(CLOJURE_NS, Symbol.internNSname("*fn-loader*"), null).setDynamic();
-	static public final PRINT_INITIALIZED:Var = Var.intern(CLOJURE_NS, Symbol.internNSname("print-initialized"));
-	static public final PR_ON:Var = Var.intern(CLOJURE_NS, Symbol.internNSname("pr-on"));
+	static public final IN_NS_VAR:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("in-ns"), F);
+	static public final NS_VAR:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("ns"), F);
+	static public final FN_LOADER_VAR:Var = Var.intern3(CLOJURE_NS, Symbol.intern1("*fn-loader*"), null).setDynamic();
+	static public final PRINT_INITIALIZED:Var = Var.intern(CLOJURE_NS, Symbol.intern1("print-initialized"));
+	static public final PR_ON:Var = Var.intern(CLOJURE_NS, Symbol.intern1("pr-on"));
 
 	static final inNamespace:IFn = new InNamespaceFN();
 	static final bootNamespace:IFn = new BootNamespaceFN();
@@ -113,7 +112,7 @@ class RT {
 		}*/
 		#if (target.sys)
 		var stderr:Output = ERR.deref();
-		stderr.writeString(msg+ "\n");
+		stderr.writeString(msg + "\n");
 		stderr.flush();
 		#elseif js
 		js.html.Console.error(msg);
@@ -124,7 +123,6 @@ class RT {
 		// TODO;
 		// trace(s);
 	}
-
 
 	static public final EMPTY_ARRAY:Vector<Any> = new Vector<Any>(0);
 	// static public final EMPTY_ARRAY:Array<Any> = new Array<Any>();
@@ -142,14 +140,14 @@ class RT {
 
 	public static function staticInit() {
 		var arglistskw:Keyword = Keyword.intern(null, "arglists");
-		var namesym:Symbol = Symbol.internNSname("name");
+		var namesym:Symbol = Symbol.intern1("name");
 		#if !js
-		OUT.setTag(Symbol.internNSname("java.io.Writer"));
+		OUT.setTag(Symbol.intern1("java.io.Writer"));
 		#end
-		CURRENT_NS.setTag(Symbol.internNSname("clojure.lang.Namespace"));
+		CURRENT_NS.setTag(Symbol.intern1("clojure.lang.Namespace"));
 		AGENT.setMeta(map(DOC_KEY, "The agent currently running an action on this thread, else nil"));
-		AGENT.setTag(Symbol.internNSname("clojure.lang.Agent"));
-		MATH_CONTEXT.setTag(Symbol.internNSname("java.math.MathContext"));
+		AGENT.setTag(Symbol.intern1("clojure.lang.Agent"));
+		MATH_CONTEXT.setTag(Symbol.intern1("java.math.MathContext"));
 		var nv:Var = Var.intern3(CLOJURE_NS, NAMESPACE, bootNamespace);
 		nv.setMacro();
 		var v:Var;

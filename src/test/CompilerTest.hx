@@ -43,6 +43,7 @@ class CompilerTest extends Test {
 		Assert.isTrue(Util.equals(PersistentVector.EMPTY, readEval("[]")));
 
 		trace("============================== CompilerTests ==========================");
+		// trace(readEval("1,2,3"));
 		// trace(readEval("(let* [a 1] a)"));
 		// trace(readEval("(def a 10) a"));
 

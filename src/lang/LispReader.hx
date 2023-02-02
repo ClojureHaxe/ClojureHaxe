@@ -1270,7 +1270,7 @@ class CtorReaderLR extends AFn {
 			}
 			var v:Vector<Any> = new Vector<Any>(1);
 			v[0] = vals;
-			ret = Reflector.invokeStaticMethodClass(recordClass, "create", v);
+			ret = Reflector.invokeMethod(recordClass, "create", v);
 		}
 
 		return ret;
