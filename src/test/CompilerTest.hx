@@ -91,6 +91,26 @@ class CompilerTest extends Test {
 		Assert.equals(20, readEval(code));
 		// trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END testInstanceField >>>>>>>>>>>>>>>>>>>>>>>>");
 	}
+
+	public function testInstanceMethod() {
+		// trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> START testStaticMethod >>>>>>>>>>>>>>>>>>>>>>>>");
+		var code:String = '(def user
+			                    (new test.Person "Nik" 20))
+			
+		                   (. user say)';
+
+		Assert.equals(new Person("Nik", 20).say(), readEval(code));
+		var res:Any = readEval(code);
+		// trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END testStaticMethod >>>>>>>>>>>>>>>>>>>>>>>>");
+	}
+
+	public function testStaticMethod() {
+		// trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> START testStaticMethod >>>>>>>>>>>>>>>>>>>>>>>>");
+		Person.count = 15;
+		var code:String = '(. test.Person getCount)';
+		Assert.equals(15, readEval(code));
+		// trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END testStaticMethod >>>>>>>>>>>>>>>>>>>>>>>>");
+	}
 	/*
 		public function testPython {
 			// trace("PYTHON TEST>>>>>>>>>>>>>>>>>>>>>>>>>");
@@ -105,7 +125,6 @@ class CompilerTest extends Test {
 		}
 	 */
 }
-
 
 class Person {
 	public static var count:Int = 0;

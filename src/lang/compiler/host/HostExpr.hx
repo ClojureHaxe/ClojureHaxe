@@ -218,26 +218,27 @@ class HostExprParser implements IParser {
 		if (c == null)
 			instance = Compiler.analyze(context == C.EVAL ? context : C.EXPRESSION, RT.second(form));
 
-		var maybeField:Bool = RT.length(form) == 3 && (U.instanceof(RT.third(form), Symbol));
+		var maybeField:Bool = RT.length(form) == 3
+			&& U.instanceof(RT.third(form), Symbol)
+			&& (RT.third(form) : Symbol).name.charAt(0) == '-';
+		/*
+			if (maybeField && !((RT.third(form) : Symbol).name.charAt(0) == '-')) {
+				var sym:Symbol = RT.third(form);
+				// TODO:?
+					if (c != null)
+						maybeField = Reflector.getMethods(c, 0, munge(sym.name), true).size() == 0;
+					else if (instance != null && instance.hasJavaClass() && instance.getJavaClass() != null)
+						maybeField = Reflector.getMethods(instance.getJavaClass(), 0, munge(sym.name), false).size() == 0;
 
-		if (maybeField && !((RT.third(form) : Symbol).name.charAt(0) == '-')) {
-			var sym:Symbol = RT.third(form);
-			// TODO:?
-			/*
-				if (c != null)
-					maybeField = Reflector.getMethods(c, 0, munge(sym.name), true).size() == 0;
-				else if (instance != null && instance.hasJavaClass() && instance.getJavaClass() != null)
-					maybeField = Reflector.getMethods(instance.getJavaClass(), 0, munge(sym.name), false).size() == 0;
-			 */
-			maybeField = true;
-		}
+				maybeField = true;
+			}
+		 */
 
+		// trace(">>>>>>>>>>>>>> HOST EXRP: " + c + " " + maybeField);
 		if (maybeField) // field
 		{
 			var sym:Symbol = ((RT.third(form) : Symbol).name.charAt(0) == '-') ? Symbol.intern1((RT.third(form) : Symbol).name.substring(1)) : RT.third(form);
 			var tag:Symbol = Compiler.tagOf(form);
-			// TODO:
-			// return new StaticFieldExpr(line, column, c, Compiler.munge(sym.name), tag);
 			if (c != null) {
 				return new StaticFieldExpr(line, column, c, Compiler.munge(sym.name), tag);
 			} else
@@ -255,15 +256,11 @@ class HostExprParser implements IParser {
 				args = args.cons(Compiler.analyze(context == C.EVAL ? context : C.EXPRESSION, s.first()));
 				s = s.next();
 			}
-
-			// TODO:
-			return null;
-			/* 
-				if (c != null)
-					return new StaticMethodExpr(source, line, column, tag, c, munge(sym.name), args, tailPosition);
-				else
-					return new InstanceMethodExpr(source, line, column, tag, instance, munge(sym.name), args, tailPosition);
-			 */
+			// trace(">>>>>>>>>>>>>> HOST EXRP: " + c);
+			if (c != null)
+				return new StaticMethodExpr(source, line, column, tag, c, Compiler.munge(sym.name), args, tailPosition);
+			else
+				return new InstanceMethodExpr(source, line, column, tag, instance, Compiler.munge(sym.name), args, tailPosition);
 		}
 	}
 }
