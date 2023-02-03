@@ -1,5 +1,6 @@
 package test;
 
+import lang.Reflector;
 import lang.PersistentHashSet;
 import lang.IPersistentMap;
 import lang.Compiler;
@@ -8,6 +9,8 @@ import lang.Util;
 import lang.PersistentVector;
 import lang.U;
 import lang.RT;
+import lang.Var;
+import haxe.ds.Vector;
 import utest.Test;
 import utest.Assert;
 
@@ -42,10 +45,11 @@ class CompilerTest extends Test {
 		// Empty
 		Assert.isTrue(Util.equals(PersistentVector.EMPTY, readEval("[]")));
 
-		trace("============================== CompilerTests ==========================");
+		// trace("============================== CompilerTests ==========================");
 		// trace(readEval("1,2,3"));
 		// trace(readEval("(let* [a 1] a)"));
 		// trace(readEval("(def a 10) a"));
+		// trace(readEval("(. lang.RT -AGENT)"));
 
 		// var s:String = "(do 1 2 {:a 1 :b 2 :c [1 2 3]})";
 		// trace(readEval(s));
@@ -66,5 +70,64 @@ class CompilerTest extends Test {
 
 	public function testDefExpr() {
 		Assert.equals(10, readEval("(def a 10) a"));
+	}
+
+	public function testStaticField() {
+		Assert.equals(readEval("(. lang.RT -AGENT)"), RT.AGENT);
+	}
+
+	public function testNewExpr() {
+		var user:Person = readEval("(new test.Person \"Nik\" 20)");
+		Assert.isTrue(U.instanceof(user, Person) && user.age == 20 && user.name == "Nik");
+	}
+
+	public function testInstanceField() {
+		// trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> START testInstanceField >>>>>>>>>>>>>>>>>>>>>>>>");
+		var code:String = '(def user
+			                   (new test.Person "Nik" 20))
+							   
+						   (. user -age)';
+
+		Assert.equals(20, readEval(code));
+		// trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END testInstanceField >>>>>>>>>>>>>>>>>>>>>>>>");
+	}
+	/*
+		public function testPython {
+			// trace("PYTHON TEST>>>>>>>>>>>>>>>>>>>>>>>>>");
+			#if python
+			// trace(readEval("(. str capitalize \"hello\")"));
+			var v:Vector<Any> = new Vector(1);
+			v[0] = "hello";
+			trace(Reflector.invokeStaticMethod("str", "capitalize", v));
+
+			// trace(python.Syntax.code("str.capitalize({0})", "hello"));
+			#end
+		}
+	 */
+}
+
+
+class Person {
+	public static var count:Int = 0;
+
+	public var name:String;
+	public var age:Int;
+
+	public static function getCount():Int {
+		return count;
+	}
+
+	public function new(name:String, age:Int) {
+		count++;
+		this.name = name;
+		this.age = age;
+	}
+
+	public function say():String {
+		return "Hello, my name is " + name + ",  I'm " + age + " age old!";
+	}
+
+	public function toString():String {
+		return 'Person{name=$name, age=$age}';
 	}
 }

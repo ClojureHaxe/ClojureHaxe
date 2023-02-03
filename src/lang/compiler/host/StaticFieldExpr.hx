@@ -1,4 +1,4 @@
-package lang.compiler;
+package lang.compiler.host;
 
 class StaticFieldExpr extends FieldExpr implements AssignableExpr {
 	public var fieldName:String;

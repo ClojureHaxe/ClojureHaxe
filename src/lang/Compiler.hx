@@ -5,6 +5,7 @@ import lang.exceptions.IllegalArgumentException;
 import lang.exceptions.IllegalStateException;
 import lang.exceptions.ArityException;
 import lang.compiler.*;
+import lang.compiler.host.*;
 
 enum C {
 	STATEMENT; // value ignored
@@ -82,7 +83,7 @@ class Compiler {
 
 	static public final specials:IPersistentMap = PersistentHashMap.create( //
 		DEF, new DefExpr.DefExprParser(), //
-		//LOOP, new LetExpr.LetExprParser(), // RECUR, new RecurExpr.Parser(),
+		// LOOP, new LetExpr.LetExprParser(), // RECUR, new RecurExpr.Parser(),
 		IF, new IfExpr.IfExprParser(), //
 		// CASE, new CaseExpr.Parser(),
 		LET, new LetExpr.LetExprParser(), //
@@ -92,7 +93,7 @@ class Compiler {
 		// QUOTE, new ConstantExpr.Parser(),
 		// THE_VAR, new TheVarExpr.Parser(),
 		// IMPORT, new ImportExpr.Parser(),
-		// DOT, new HostExpr.Parser(),
+		DOT, new HostExpr.HostExprParser(), //
 		// ASSIGN, new AssignExpr.Parser(),
 		// DEFTYPE, new NewInstanceExpr.DeftypeParser(),
 		// REIFY, new NewInstanceExpr.ReifyParser(),
@@ -102,7 +103,7 @@ class Compiler {
 		// MONITOR_EXIT, new MonitorExitExpr.Parser(),
 		// CATCH, null,
 		// FINALLY, null,
-		// NEW, new NewExpr.Parser(),
+		NEW, new NewExpr.NewExprParser(), //
 		_AMP_, null);
 
 	private static final MAX_POSITIONAL_ARITY:Int = 20;

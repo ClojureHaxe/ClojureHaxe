@@ -19,6 +19,7 @@ class ReflectorTest extends Test {
 		Assert.equals(0, Reflector.getStaticField("test.User", "count"));
 
 		var user:User = Reflector.invokeConstructor(User, v);
+		Assert.isTrue(U.instanceof(user, User));
 
 		Assert.equals(1, Reflector.getField(User, "count"));
 		Assert.equals(1, Reflector.getStaticField("test.User", "count"));
@@ -41,11 +42,11 @@ class ReflectorTest extends Test {
 
 		// Reflector.set
 		// trace(user, Reflector.getStaticField("test.User", "count"), Reflector.getField(User, "count"));
-
-		Assert.isTrue(U.instanceof(user, User));
 	}
 }
 
+// Be aware that there is static field in Class, so don't use it in anoter tests
+// Because they can modify count field and this 'bug' will be hard to catch
 class User {
 	public static var count:Int = 0;
 
