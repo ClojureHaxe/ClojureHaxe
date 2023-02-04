@@ -7,7 +7,7 @@ Experimental Clojure port written in [Haxe](https://haxe.org/) targeting C++, Ha
 2. JavaScript, Java, C# (because these implemetations already exist)
 3. PHP, Flash (not tested)
 
-*[HashLink](https://hashlink.haxe.org/) is a virtual machine for Haxe [oriented towards real time games](https://haxe.org/blog/shirogames-stack/).
+[HashLink](https://hashlink.haxe.org/) is a virtual machine for Haxe [oriented towards real time games](https://haxe.org/blog/shirogames-stack/).
 
 ## Status
 Work in progress. Near all major classes from `clojure.lang.*` have been ported, ignoring all concurrent primitives and thread-safety (see 'Concurrent primitives' table at the bottom). On the way to work on Compiler and load/compile `clojure.core`.
@@ -16,12 +16,12 @@ Work in progress. Near all major classes from `clojure.lang.*` have been ported,
 
 | Platform | Build size | Tests | Tests time | Comment |
 |---| ---| ---|  ---|  ---|
-| C++ | 6.1 MB |  198/198 (ALL) | 0,018s |
-| HashLink | 348 KB  | 198/198 (ALL) | 0,075s |
-| Python | 812 KB  | 198/198 (ALL) | 1,368s |
-| Lua | 916.5 KB | 197/198 |  0,870s | Due to [#10909](https://github.com/HaxeFoundation/haxe/issues/10909) |
+| C++ | 6.3 MB |  226/226 (ALL) | 0,024s |
+| HashLink | 359 KB  | 226/226 (ALL) | 0,093s |
+| Python | 836 KB  | 226/226 (ALL) | 1,893s |
+| Lua | 952.5 KB | 225/226 |  1,356s | Due to [#10909](https://github.com/HaxeFoundation/haxe/issues/10909) |
 | JavaScript | 512 KB | 157/157 | 0,196s | Previous results
-| Java | 603.5 KB | 192/194 | 0,426s | Due to [#10906](https://github.com/HaxeFoundation/haxe/issues/10906) |
+| Java | 638.3.5 KB | 208/210 | 0,570s | Due to [#10906](https://github.com/HaxeFoundation/haxe/issues/10906) |
 | C# | | | | Not compiled because of double methods generation  |
 | PHP |  || | Not tested
 | Flash | | | | Not tested
