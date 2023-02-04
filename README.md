@@ -12,7 +12,7 @@ Experimental Clojure port written in [Haxe](https://haxe.org/) targeting C++, Ha
 ## Status
 Work in progress. Near all major classes from `clojure.lang.*` have been ported, ignoring all concurrent primitives and thread-safety (see 'Concurrent primitives' table at the bottom). On the way to work on Compiler and load/compile `clojure.core`.
 
-## Current status per platform
+### Current status per platform
 
 | Platform | Build size | Tests | Tests time | Comment |
 |---| ---| ---|  ---|  ---|
@@ -22,7 +22,7 @@ Work in progress. Near all major classes from `clojure.lang.*` have been ported,
 | Lua | 952.5 KB | 225/226 |  1,356s | Due to [#10909](https://github.com/HaxeFoundation/haxe/issues/10909) |
 | JavaScript | 610.5 KB | 226/226 (ALL) | 0,329s | 
 | Java | 638.3.5 KB | 208/210 | 0,570s | Due to [#10906](https://github.com/HaxeFoundation/haxe/issues/10906) |
-| C# | | | | Not compiled because of double methods generation  |
+| C# | | | | Not compiled |
 | PHP |  || | Not tested
 | Flash | | | | Not tested
 
@@ -36,7 +36,7 @@ In Java and Lua there are some bugs in `haxe.Rest`, but I think it is possible t
 
 Because this port is based on Clojure JVM implementation, which uses some system features (for example filesystem in clojure.lang.RT), for JavaScript it needs some other implementations in those places and more [conditional compilation](https://haxe.org/manual/lf-condition-compilation.html). And because JS is not in 1 priority, sometimes it can be postponed and have old results in the table.
 
-C# target is not built probably because of complex hierarchy and methods with same names in base class/interface and sublclasses/subinterfaces. Needs more investigating.
+C# target is not built because of double methods generation, probably because of complex hierarchy and methods with same names in base class/interface and sublclasses/subinterfaces. Needs more investigating.
 
 ## Near future goals
 
