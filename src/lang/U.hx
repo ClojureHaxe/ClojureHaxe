@@ -20,7 +20,7 @@ class U {
 		return new UniqueObject();
 	}
 
-	public static function instanceof(value:Any, c:Dynamic):Bool {
+	public static inline function instanceof(value:Any, c:Dynamic):Bool {
 		// return Std.downcast(value, c) != null;
 		return Std.isOfType(value, c);
 	}

@@ -116,5 +116,9 @@ class LispReaderTest extends utest.Test {
 		Assert.equals(3, RT.count(RT.second(ret)));
 		Assert.isTrue(Symbol.intern1("&").equals(RT.second(RT.second(ret))));
 		Assert.equals(4, RT.count(RT.third(ret)));
+
+		// quote
+		var c:Any = PersistentList.create(Symbol.intern1("inc"), PersistentList.create(Symbol.intern1("quote"), Symbol.intern1("a")));
+		Assert.isTrue(Util.equals(c, parse("(inc 'a)")));
 	}
 }

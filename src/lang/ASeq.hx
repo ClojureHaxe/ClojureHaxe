@@ -5,7 +5,7 @@ import haxe.Exception;
 import haxe.ds.Vector;
 
 abstract class ASeq extends Obj implements ISeq implements Sequential // TODO: implements List implements Serializable
-implements IHashEq implements Collection {
+implements IHashEq implements Collection implements IEqual {
 	var _hash:Int = 0;
 	var _hasheq:Int = 0;
 
@@ -25,17 +25,32 @@ implements IHashEq implements Collection {
 		if (!(U.instanceof(obj, Sequential)) // TODO: //||  (Std.downcast(obj, List)!= null)
 		)
 			return false;
-
 		if (U.instanceof(this, Counted) && U.instanceof(obj, Counted) && cast(this, Counted).count() != cast(obj, Counted).count())
 			return false;
-
 		var ms:ISeq = RT.seq(obj);
 		var s:ISeq = this;
 		while (s != null) {
 			if (ms == null || !Util.equiv(s.first(), ms.first()))
 				return false;
+			s = s.next();
+			ms = ms.next();
 		}
+		return ms == null;
+	}
 
+	public function equals(obj:Any):Bool {
+		if (this == obj)
+			return true;
+		if (!(U.instanceof(obj, Sequential))) // TODO: || U.instanceof(obj, List)
+			return false;
+		var ms:ISeq = RT.seq(obj);
+		var s:ISeq = seq();
+		while (s != null) {
+			if (ms == null || !Util.equals(s.first(), ms.first()))
+				return false;
+			s = s.next();
+			ms = ms.next();
+		}
 		return ms == null;
 	}
 
