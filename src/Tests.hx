@@ -23,7 +23,7 @@ class Tests {
 	static function main() {
 		RT.staticInit();
 
-		// utest.UTest.run([new test.LispReaderTest()]);
+		// utest.UTest.run([new test.CompilerTest()]);
 
 		// the long way
 		var runner = new Runner();

@@ -14,8 +14,8 @@
 # --php bin/php
 # --next 
 
-# --js testBin/js/main.js
-# --next
+--js testBin/js/main.js
+--next
 
 --hl testBin/hl/main.hl 
 --next

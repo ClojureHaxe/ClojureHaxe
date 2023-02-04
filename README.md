@@ -20,7 +20,7 @@ Work in progress. Near all major classes from `clojure.lang.*` have been ported,
 | HashLink | 359 KB  | 226/226 (ALL) | 0,093s |
 | Python | 836 KB  | 226/226 (ALL) | 1,893s |
 | Lua | 952.5 KB | 225/226 |  1,356s | Due to [#10909](https://github.com/HaxeFoundation/haxe/issues/10909) |
-| JavaScript | 512 KB | 157/157 | 0,196s | Previous results
+| JavaScript | 610.5 KB | 226/226 (ALL) | 0,329s | 
 | Java | 638.3.5 KB | 208/210 | 0,570s | Due to [#10906](https://github.com/HaxeFoundation/haxe/issues/10906) |
 | C# | | | | Not compiled because of double methods generation  |
 | PHP |  || | Not tested
@@ -34,7 +34,7 @@ Build sizes are for builds that run tests.
 
 In Java and Lua there are some bugs in `haxe.Rest`, but I think it is possible to avoid them or they will be fixed in feature Haxe realeases.
 
-Because this port is based on Clojure JVM implementation, which uses some system features (for example filesystem in clojure.lang.RT), for JavaScript it needs some other implementations in those places and more [conditional compilation](https://haxe.org/manual/lf-condition-compilation.html). And because JS is not in 1 priority, I decided to postpone it for later.
+Because this port is based on Clojure JVM implementation, which uses some system features (for example filesystem in clojure.lang.RT), for JavaScript it needs some other implementations in those places and more [conditional compilation](https://haxe.org/manual/lf-condition-compilation.html). And because JS is not in 1 priority, sometimes it can be postponed and have old results in the table.
 
 C# target is not built probably because of complex hierarchy and methods with same names in base class/interface and sublclasses/subinterfaces. Needs more investigating.
 

@@ -184,6 +184,7 @@ class RT {
 	}
 
 	public static function loadResourceScript2(name:String, failIfNotFound:Bool) {
+		#if !js
 		var r = new EReg("/", "");
 		var file:String = r.split(name).pop();
 		var data:String = File.getContent("src/" + name);
@@ -200,6 +201,9 @@ class RT {
 		} else if (failIfNotFound) {
 			throw new Exception("Could not locate Clojure resource on classpath: " + name);
 		}
+		#else
+		throw new UnsupportedOperationException("Loading file resource is not supported on this platform!");
+		#end
 	}
 
 	static public function load(scriptBase:String) {
@@ -967,11 +971,15 @@ class RT {
 			} else {
 				return loader.getResource(name);
 		}*/
+		#if !js
 		var fullPath:String = "src/" + name;
 		if (FileSystem.exists(fullPath)) {
 			return fullPath;
 		} else
 			return null;
+		#else
+		throw new UnsupportedOperationException("Loading file resource is not supported on this platform!");
+		#end
 	}
 
 	static public function classForName(name:String):Class<Dynamic> {

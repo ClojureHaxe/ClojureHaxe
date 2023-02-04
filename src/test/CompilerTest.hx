@@ -37,10 +37,10 @@ class CompilerTest extends Test {
 		Assert.equals(2, m.valAt(Keyword.intern1("b")));
 
 		// vector
-		Assert.isTrue(Util.equals(PersistentVector.createFromItems(1, 2, 3), readEval("[1,2,3]")));
+		Assert.isTrue(Util.equals(PersistentVector.createFromItems(1, 2, 3), readEval("[1,2,3]")), "Eval Vector test");
 
 		// set
-		Assert.isTrue(Util.equals(PersistentHashSet.create(1, 2, 3), readEval("#{1,2,3}")));
+		Assert.isTrue(Util.equals(PersistentHashSet.create(1, 2, 3), readEval("#{1,2,3}")), "Eval Set test");
 
 		// Empty
 		Assert.isTrue(Util.equals(PersistentVector.EMPTY, readEval("[]")));
@@ -73,12 +73,12 @@ class CompilerTest extends Test {
 	}
 
 	public function testStaticField() {
-		Assert.equals(readEval("(. lang.RT -AGENT)"), RT.AGENT);
+		Assert.equals(readEval("(. lang.RT -AGENT)"), RT.AGENT, "testStaticField");
 	}
 
 	public function testNewExpr() {
 		var user:Person = readEval("(new test.Person \"Nik\" 20)");
-		Assert.isTrue(U.instanceof(user, Person) && user.age == 20 && user.name == "Nik");
+		Assert.isTrue(U.instanceof(user, Person) && user.age == 20 && user.name == "Nik", "testNewExpr");
 	}
 
 	public function testInstanceField() {
@@ -88,7 +88,7 @@ class CompilerTest extends Test {
 							   
 						   (. user -age)';
 
-		Assert.equals(20, readEval(code));
+		Assert.equals(20, readEval(code), "testInstanceField");
 		// trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END testInstanceField >>>>>>>>>>>>>>>>>>>>>>>>");
 	}
 
@@ -99,7 +99,7 @@ class CompilerTest extends Test {
 			
 		                   (. user say)';
 
-		Assert.equals(new Person("Nik", 20).say(), readEval(code));
+		Assert.equals(new Person("Nik", 20).say(), readEval(code), "testInstanceMethod");
 		var res:Any = readEval(code);
 		// trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END testStaticMethod >>>>>>>>>>>>>>>>>>>>>>>>");
 	}
@@ -108,7 +108,7 @@ class CompilerTest extends Test {
 		// trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> START testStaticMethod >>>>>>>>>>>>>>>>>>>>>>>>");
 		Person.count = 15;
 		var code:String = '(. test.Person getCount)';
-		Assert.equals(15, readEval(code));
+		Assert.equals(15, readEval(code), "testStaticMethod");
 		// trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END testStaticMethod >>>>>>>>>>>>>>>>>>>>>>>>");
 	}
 	/*

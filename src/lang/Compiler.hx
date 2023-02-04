@@ -430,9 +430,9 @@ class Compiler {
 			}
 			if (form == null)
 				return NIL_EXPR;
-			else if (RT.T == form #if (cpp || python) && U.isBool(form) #end) // isBool check only for CPP and Python cause 1 == true
+			else if (RT.T == form #if (cpp || python || js) && U.isBool(form) #end) // isBool check only for CPP and Python cause 1 == true
 				return TRUE_EXPR;
-			else if (RT.F == form #if (cpp || python) && U.isBool(form) #end) // isBool check only for CPP and Python  cause 1 == true
+			else if (RT.F == form #if (cpp || python || js) && U.isBool(form) #end) // isBool check only for CPP and Python  cause 1 == true
 				return FALSE_EXPR;
 			if (U.instanceof(form, Symbol))
 				return analyzeSymbol(form);
