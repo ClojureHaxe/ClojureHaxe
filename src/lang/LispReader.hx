@@ -211,7 +211,7 @@ class LispReader {
 				// trace(">>> read9 macroFn: " + String.fromCharCode(ch) + " " + macroFn);
 				if (macroFn != null) {
 					var ret:Any = macroFn.invoke4(r, ch, opts, pendingForms);
-					//	trace(">>> read9 macroFN ret: " + ret);
+					// trace(">>> read9 macroFN ret: " + ret);
 					// no op macros return the reader
 					if (r == ret)
 						continue;
@@ -434,7 +434,7 @@ class LispReader {
 	}
 
 	static public function isTerminatingMacro(ch:Int):Bool {
-		return (ch != '#'.code && ch != "'".code && isMacro(ch));
+		return (ch != '#'.code && ch != "'".code && ch != '%'.code && isMacro(ch));
 	}
 
 	static public function garg(n:Int) {
@@ -802,9 +802,13 @@ class FnReaderLR extends AFn {
 					args = args.cons(restsym);
 				}
 			}
-			return RT.list(Compiler.FN, args, form);
+			var ret:Any = RT.list(Compiler.FN, args, form);
+			Var.popThreadBindings();
+			return ret;
+		} catch (e:Exception) {
+			Var.popThreadBindings();
+			throw e;
 		}
-		Var.popThreadBindings();
 	}
 }
 

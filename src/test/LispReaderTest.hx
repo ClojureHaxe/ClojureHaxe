@@ -92,5 +92,29 @@ class LispReaderTest extends utest.Test {
 		Assert.equals(1, p.count());
 		Assert.isTrue(Util.pcequiv(PersistentVector.createFromItems(1), p));
 		Assert.equals(2, m.valAt(1));
+
+		// FnReader
+		// trace(parse("(fn [a] (inc a))"));
+		var ret:ISeq = parse("#(inc %)"); // (fn* [p1__2#] (inc p1__2#))
+		Assert.equals(ret.first(), Compiler.FN);
+		Assert.isTrue(U.instanceof(RT.second(ret), PersistentVector));
+		Assert.isTrue(Symbol.intern1("inc").equals(RT.first(RT.third(ret))));
+
+		// parse fn second time
+		ret = parse("#(inc %)");
+		Assert.equals(ret.first(), Compiler.FN);
+		Assert.isTrue(U.instanceof(RT.second(ret), PersistentVector));
+		Assert.isTrue(Symbol.intern1("inc").equals(RT.first(RT.third(ret))));
+
+		// test wrong rest &% instead of %&
+		var ret:ISeq = parse(" #(inc % % &%)"); // (fn* [p1__1#] (inc p1__1# p1__1# &%))
+		Assert.equals(ret.first(), Compiler.FN);
+		Assert.isTrue(Symbol.intern1("&%").equals(RT.fourth(RT.third(ret))));
+
+		// test rest
+		ret = parse(" #(inc % % %&)"); // (fn* [p1__2# & rest__3#] (inc p1__2# p1__2# rest__3#))
+		Assert.equals(3, RT.count(RT.second(ret)));
+		Assert.isTrue(Symbol.intern1("&").equals(RT.second(RT.second(ret))));
+		Assert.equals(4, RT.count(RT.third(ret)));
 	}
 }
