@@ -157,7 +157,7 @@ class Primordial extends RestFn {
 }
 
 class EmptyList extends Obj implements IPersistentList // implements List
-implements ISeq implements Counted implements IHashEq implements IEqual implements Collection {
+implements ISeq implements Counted implements IHashEq implements Collection {
 	static final _hasheq:Int = Murmur3.hashOrdered(new Array<Any>());
 
 	public function hashCode():Int {

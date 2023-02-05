@@ -5,17 +5,9 @@ import lang.exceptions.IllegalArgumentException;
 import Type.ValueType;
 import haxe.ds.Vector;
 
-// Becuase Haxe doesn't allow to overload functions with different args count,
-// it needs to declare a function with maximum possible arguments.
-// And to distinguish the absense of arg from nil we need special default value.
-enum EMPTY_ARG {
-	NO_ARG;
-}
-
 class U {
-	// public static final NoArg:Any = new EmptyArg();
 	// In Java implementation sometimes "new Object();" is used to late compare with itself.
-	// So this creates unique object
+	// So this creates new unique object for that
 	public static inline function object():UniqueObject {
 		return new UniqueObject();
 	}

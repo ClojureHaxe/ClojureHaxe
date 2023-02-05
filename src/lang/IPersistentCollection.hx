@@ -1,6 +1,8 @@
 package lang;
 
-interface IPersistentCollection extends Seqable {
+// Because Haxe doens't have default equals method for every class,
+// lets extends IPersistentCollection here with IEqual for all collections
+interface IPersistentCollection extends Seqable extends IEqual {
 	public function count():Int;
 
 	public function cons(o:Any):IPersistentCollection;

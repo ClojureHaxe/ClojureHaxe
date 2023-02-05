@@ -6,8 +6,8 @@ import lang.exceptions.UnsupportedOperationException;
 import lang.exceptions.NoSuchElementException;
 import lang.exceptions.IllegalArgumentException;
 
-abstract class APersistentVector extends AFn implements IPersistentVector implements RandomAccess implements IHashEq
-		implements IEqual // implements Comparable  implements Serializable implements Iterable implements List
+abstract class APersistentVector extends AFn implements IPersistentVector implements RandomAccess
+		implements IHashEq // implements Comparable  implements Serializable implements Iterable implements List
 {
 	var _hash:Int = 0;
 	var _hasheq:Int = 0;

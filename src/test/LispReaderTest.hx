@@ -120,5 +120,18 @@ class LispReaderTest extends utest.Test {
 		// quote
 		var c:Any = PersistentList.create(Symbol.intern1("inc"), PersistentList.create(Symbol.intern1("quote"), Symbol.intern1("a")));
 		Assert.isTrue(Util.equals(c, parse("(inc 'a)")));
+
+		// namespaced keyword
+		Assert.isTrue(Keyword.intern("clojure.core", "hello").equals(parse("::hello")));
+
+		// namespaced map
+		Assert.isTrue(Util.equals(PersistentArrayMap.create(Keyword.create1("a/b"), 1), parse("#:a{:b 1}")));
+
+		// var test
+		Assert.isTrue(Util.equals(PersistentList.create(Symbol.intern1("var"), Symbol.intern1("ab")), parse("#'ab")));
+
+		// syntax quote
+		Assert.isTrue(PersistentList.create(Symbol.intern1("quote"), Symbol.intern1("clojure.core/ab")).equals(parse("`ab")));
+		// trace(parse("`ab"));
 	}
 }

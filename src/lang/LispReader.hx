@@ -1,6 +1,5 @@
 package lang;
 
-import lang.U.EMPTY_ARG;
 import haxe.Exception;
 import haxe.ds.Vector;
 import haxe.Rest;
@@ -9,8 +8,6 @@ import lang.exceptions.IllegalArgumentException;
 import lang.exceptions.IllegalStateException;
 import lang.exceptions.NumberFormatException;
 import lang.exceptions.UnsupportedOperationException;
-
-// import lang.lispreader.*;
 
 class LispReader {
 	static public final QUOTE:Symbol = Symbol.createNSname("quote");
@@ -337,6 +334,7 @@ class LispReader {
 				return null;
 			if (StringTools.startsWith(s, "::")) {
 				var ks:Symbol = Symbol.internNSname(s.substring(2));
+				trace(">>>>> KW: " + ks);
 				if (resolver != null) {
 					var nsym:Symbol;
 					if (ks.ns != null)
@@ -638,7 +636,7 @@ class NamespaceMapReaderLR extends AFn {
 		// Resolve autoresolved ns
 		var ns:String;
 		if (auto) {
-			var resolver:Resolver = cast RT.READER_RESOLVER.deref();
+			var resolver:Resolver = RT.READER_RESOLVER.deref();
 			if (sym == null) {
 				if (resolver != null)
 					ns = resolver.currentNS().name;
@@ -887,10 +885,13 @@ class SyntaxQuoteReaderLR extends AFn {
 			Var.pushThreadBindings(RT.map(LispReader.GENSYM_ENV, PersistentHashMap.EMPTY));
 
 			var form:Any = LispReader.read6(r, true, null, true, opts, LispReader.ensurePending(pendingForms));
-			return syntaxQuote(form);
-		} catch (e) {}
-		Var.popThreadBindings();
-		return null;
+			var ret:Any = syntaxQuote(form);
+			Var.popThreadBindings();
+			return ret;
+		} catch (e) {
+			Var.popThreadBindings();
+			throw e;
+		}
 	}
 
 	static function syntaxQuote(form:Any):Any {
@@ -1282,7 +1283,7 @@ class CtorReaderLR extends AFn {
 }
 
 class ConditionalReaderLR extends AFn {
-	static private final READ_STARTED:Any = EMPTY_ARG.NO_ARG; // Symbol.createNSname();
+	static private final READ_STARTED:Any = U.object();
 	static public final DEFAULT_FEATURE:Keyword = Keyword.intern(null, "default");
 	static public final RESERVED_FEATURES:IPersistentSet = RT.set(Keyword.intern(null, "else"), Keyword.intern(null, "none"));
 
@@ -1436,7 +1437,7 @@ class ConditionalReaderLR extends AFn {
 			}
 		} catch (e) {
 			Var.popThreadBindings();
-			return null;
+			throw e;
 		}
 	}
 }
