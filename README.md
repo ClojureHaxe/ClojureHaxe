@@ -21,7 +21,7 @@ Work in progress. Near all major classes from `clojure.lang.*` have been ported,
 | Python | 836 KB  | 226/226 (ALL) | 1,893s |
 | Lua | 952.5 KB | 225/226 |  1,356s | Due to [#10909](https://github.com/HaxeFoundation/haxe/issues/10909) |
 | JavaScript | 610.5 KB | 226/226 (ALL) | 0,329s | 
-| Java | 638.3.5 KB | 208/210 | 0,570s | Due to [#10906](https://github.com/HaxeFoundation/haxe/issues/10906) |
+| Java | 638.3 KB | 208/210 | 0,570s | Due to [#10906](https://github.com/HaxeFoundation/haxe/issues/10906) |
 | C# | | | | Not compiled |
 | PHP |  || | Not tested
 | Flash | | | | Not tested
@@ -38,7 +38,7 @@ Because this port is based on Clojure JVM implementation, which uses some system
 
 C# target is not built because of double methods generation, probably because of complex hierarchy and methods with same names in base class/interface and sublclasses/subinterfaces. Needs more investigating.
 
-## Near future goals
+## First goals
 
 * Be able to run base, general, single-threaded version of Clojure REPL as interpreter (without full support for concurrency and parallelism for now) on various platforms
 * Discover all posibilities that this will bring
