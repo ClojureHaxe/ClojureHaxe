@@ -111,6 +111,12 @@ class CompilerTest extends Test {
 		Assert.equals(15, readEval(code), "testStaticMethod");
 		// trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END testStaticMethod >>>>>>>>>>>>>>>>>>>>>>>>");
 	}
+
+	// public function testLet() {
+	// 	trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> START testLet  >>>>>>>>>>>>>>>>>>>>>>>>");
+	// 	trace(readEval(" (let* [a 10] a)  "));
+	// 	trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END testLet >>>>>>>>>>>>>>>>>>>>>>>>");
+	// }
 	/*
 		public function testPython {
 			// trace("PYTHON TEST>>>>>>>>>>>>>>>>>>>>>>>>>");

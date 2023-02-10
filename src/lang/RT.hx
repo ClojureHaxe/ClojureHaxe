@@ -398,15 +398,12 @@ class RT {
 					return i + s.count();
 				}
 				i++;
+				s = s.next();
 			}
 			return i;
 		} else if (U.instanceof(o, String)) {
-			return cast(o, String).length;
-		}
-			// TODO:
-			// else if (o instanceof CharSequence)
-		//	return ((CharSequence) o).length();
-		else if (U.instanceof(o, Collection))
+			return (o : String).length;
+		} else if (U.instanceof(o, Collection))
 			return (o : Collection).size();
 			// else if (o instanceof Map)
 		//	return ((Map) o).size();

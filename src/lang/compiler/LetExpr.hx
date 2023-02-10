@@ -11,14 +11,34 @@ class LetExpr implements Expr implements MaybePrimitiveExpr {
 	public var body:Expr;
 	public var isLoop:Bool;
 
-	public function new(bindingInits:PersistentVector, body:Expr, isLoop:Bool) {
+	// public var bindings:Map<Symbol, Expr> = new Map();
+
+	public function new(bindingInits:PersistentVector, body:Expr, isLoop:Bool // ,  bindings:Map<Symbol, Expr>
+	) {
 		this.bindingInits = bindingInits;
 		this.body = body;
 		this.isLoop = isLoop;
+		// this.bindings = bindings;
 	}
 
 	public function eval():Any {
-		throw new UnsupportedOperationException("Can't eval let/loop");
+		trace(">>>>>>>>>>>>>>> LetExpr EVAL");
+		// throw new UnsupportedOperationException("Can't eval let/loop");
+		for (lb in bindingInits.iterator()) {
+			trace(">>>> let expr eval: " + lb);
+			var v:Var = Compiler.lookupVar((lb : LocalBinding).sym, true);
+			Compiler.registerVar(v);
+			// Var.pushThreadBindings(RT.mapUniqueKeys(Var.intern3(RT.CURRENT_NS.deref(), (lb : LocalBinding).sym, (lb : LocalBinding).init.eval())
+			// 	.setDynamic()));
+			// v.bindRoot(init.eval());
+			Var.pushThreadBindings(RT.mapUniqueKeys(v.setDynamic(), (lb : LocalBinding).init.eval()));
+		}
+
+		var ret:Any = body.eval();
+		for (lb in bindingInits.iterator()) {
+			Var.popThreadBindings();
+		}
+		return ret;
 	}
 	/*
 		public void emit(C context, ObjExpr objx, GeneratorAdapter gen) {
@@ -95,7 +115,8 @@ class LetExpr implements Expr implements MaybePrimitiveExpr {
 }
 
 class LetExprParser implements IParser {
-	public function new(){}
+	public function new() {}
+
 	public function parse(context:C, frm:Any):Expr {
 		var form:ISeq = frm;
 		// (let [var val var2 val2 ...] body...)
@@ -109,134 +130,72 @@ class LetExprParser implements IParser {
 
 		var body:ISeq = RT.next(RT.next(form));
 
-		trace("LET EXPR: " + body + " " + RT.list(RT.list(Compiler.FNONCE, PersistentVector.EMPTY, form)));
-		if (context == C.EVAL || (context == C.EXPRESSION && isLoop))
-			return Compiler.analyze(context, RT.list(RT.list(Compiler.FNONCE, PersistentVector.EMPTY, form)));
+		trace("LET EXPR: " + body);
+		// trace("LET EXPR: " + body + " " + RT.list(RT.list(Compiler.FNONCE, PersistentVector.EMPTY, form)));
+		// Here is compiling in Java
+		//  (let* [a 10] a) =>  ((fn* [] (let* [a 10] a)))
+		// if (context == C.EVAL || (context == C.EXPRESSION && isLoop))
+		//	return Compiler.analyze(context, RT.list(RT.list(Compiler.FNONCE, PersistentVector.EMPTY, form)));
 
-		var method:ObjMethod = Compiler.METHOD.deref();
-		var backupMethodLocals:IPersistentMap = method.locals;
-		var backupMethodIndexLocals:IPersistentMap = method.indexlocals;
-		var recurMismatches:IPersistentVector = PersistentVector.EMPTY;
+		// var method:ObjMethod = Compiler.METHOD.deref();
+		// var backupMethodLocals:IPersistentMap = method.locals;
+		// var backupMethodIndexLocals:IPersistentMap = method.indexlocals;
+		// var recurMismatches:IPersistentVector = PersistentVector.EMPTY;
 
-		var i:Int = 0;
-		while (i < bindings.count() / 2) {
-			recurMismatches = cast recurMismatches.cons(RT.F);
-			i++;
-		}
+		// var i:Int = 0;
+		// while (i < bindings.count() / 2) {
+		//		recurMismatches = cast recurMismatches.cons(RT.F);
+		//			i++;
+		//	}
+
+		// trace("LET EXPR recurMismatches: " + recurMismatches);
 
 		// may repeat once for each binding with a mismatch, return breaks
 		while (true) {
+			trace("LetExprParser WHILE LOOP 1");
 			var dynamicBindings:IPersistentMap = RT.map(Compiler.LOCAL_ENV, Compiler.LOCAL_ENV.deref(), Compiler.NEXT_LOCAL_NUM,
 				Compiler.NEXT_LOCAL_NUM.deref());
-			method.locals = backupMethodLocals;
-			method.indexlocals = backupMethodIndexLocals;
+			// method.locals = backupMethodLocals;
+			// method.indexlocals = backupMethodIndexLocals;
 
-			var looproot:PathNode = new PathNode(PATHTYPE.PATH, Compiler.CLEAR_PATH.get());
-			var clearroot:PathNode = new PathNode(PATHTYPE.PATH, looproot);
-			var clearpath:PathNode = new PathNode(PATHTYPE.PATH, looproot);
-			if (isLoop)
-				dynamicBindings = cast dynamicBindings.assoc(Compiler.LOOP_LOCALS, null);
+			// var looproot:PathNode = new PathNode(PATHTYPE.PATH, Compiler.CLEAR_PATH.get());
+			// var clearroot:PathNode = new PathNode(PATHTYPE.PATH, looproot);
+			// var clearpath:PathNode = new PathNode(PATHTYPE.PATH, looproot);
 
-			try {
-				Var.pushThreadBindings(dynamicBindings);
+			var bindingInits:PersistentVector = PersistentVector.EMPTY;
+			// var loopLocals:PersistentVector = PersistentVector.EMPTY;
+			var i:Int = 0;
+			while (i < bindings.count()) {
+				if (!(U.instanceof(bindings.nth(i), Symbol)))
+					throw new IllegalArgumentException("Bad binding form, expected symbol, got: " + bindings.nth(i));
+				var sym:Symbol = bindings.nth(i);
+				if (sym.getNamespace() != null)
+					throw Util.runtimeException("Can't let qualified name: " + sym);
 
-				var bindingInits:PersistentVector = PersistentVector.EMPTY;
-				var loopLocals:PersistentVector = PersistentVector.EMPTY;
-				var i:Int = 0;
-				while (i < bindings.count()) {
-					if (!(U.instanceof(bindings.nth(i), Symbol)))
-						throw new IllegalArgumentException("Bad binding form, expected symbol, got: " + bindings.nth(i));
-					var sym:Symbol = bindings.nth(i);
-					if (sym.getNamespace() != null)
-						throw Util.runtimeException("Can't let qualified name: " + sym);
-					var init:Expr = Compiler.analyze3(C.EXPRESSION, bindings.nth(i + 1), sym.name);
-					if (isLoop) {
-						/*
-							if (recurMismatches != null && RT.booleanCast(recurMismatches.nth(i / 2))) {
-								// TODO:::: !
-								//init = new StaticMethodExpr("", 0, 0, null, RT.class, "box", RT.vector(init), false);
-								if (RT.booleanCast(RT.WARN_ON_REFLECTION.deref()))
-									RT.errPrintWriter().println("Auto-boxing loop arg: " + sym);
-							} else if (Compiler.maybePrimitiveType(init) == int.class)
-								init = new StaticMethodExpr("", 0, 0, null, RT.class, "longCast", RT.vector(init), false);
-							else if (maybePrimitiveType(init) == float.class)
-								init = new StaticMethodExpr("", 0, 0, null, RT.class, "doubleCast", RT.vector(init), false);
-						 */
-					}
-					// sequential enhancement of env (like Lisp let*)
-					try {
-						/*
-							if (isLoop) {
-								Var.pushThreadBindings(
-										RT.map(Compiler.CLEAR_PATH, clearpath,
-											Compiler.CLEAR_ROOT, clearroot,
-											Compiler.NO_RECUR, null));
+				var init:Expr = Compiler.analyze3(C.EXPRESSION, bindings.nth(i + 1), sym.name);
+				// sequential enhancement of env (like Lisp let*)
 
-							}
-						 */
+				trace(">>> LET EXPR before register: " + sym + " " + init);
+				// var lb:LocalBinding = Compiler.registerLocal(sym, Compiler.tagOf(sym), init, false);
+				// var bi:BindingInit = new BindingInit(lb, init);
+				var lb:LocalBinding = new LocalBinding(0, sym, null, init, true, null);
+				bindingInits = bindingInits.cons(lb);
 
-						var lb:LocalBinding = Compiler.registerLocal(sym, Compiler.tagOf(sym), init, false);
-						var bi:BindingInit = new BindingInit(lb, init);
-						bindingInits = bindingInits.cons(bi);
-						if (isLoop)
-							loopLocals = loopLocals.cons(lb);
-					}
-					/* finally {
-						if (isLoop)
-							Var.popThreadBindings();
-					}*/
-					i += 2;
-				}
-				if (isLoop)
-					Compiler.LOOP_LOCALS.set(loopLocals);
-				var bodyExpr:Expr;
-				var moreMismatches:Bool = false;
-				try {
-					if (isLoop) {
-						var methodReturnContext:Any = context == C.RETURN ? Compiler.METHOD_RETURN_CONTEXT.deref() : null;
-						Var.pushThreadBindings(RT.map(Compiler.CLEAR_PATH, clearpath, Compiler.CLEAR_ROOT, clearroot, Compiler.NO_RECUR, null,
-							Compiler.METHOD_RETURN_CONTEXT, methodReturnContext));
-					}
-					bodyExpr = (new BodyExpr.BodyExprParser()).parse(isLoop ? C.RETURN : context, body);
-				}
-				// emulate "finally"
-				catch (e:Exception) {
-					if (isLoop) {
-						Var.popThreadBindings();
-						var i:Int = 0;
-						while (i < loopLocals.count()) {
-							var lb:LocalBinding = cast loopLocals.nth(i);
-							if (lb.recurMistmatch) {
-								recurMismatches = cast recurMismatches.assoc(i, RT.T);
-								moreMismatches = true;
-							}
-							i++;
-						}
-					}
-					throw(e);
-				}
-				// finaly
-				{
-					if (isLoop) {
-						Var.popThreadBindings();
-						var i:Int = 0;
-						while (i < loopLocals.count()) {
-							var lb:LocalBinding = cast loopLocals.nth(i);
-							if (lb.recurMistmatch) {
-								recurMismatches = cast recurMismatches.assoc(i, RT.T);
-								moreMismatches = true;
-							}
-							i++;
-						}
-					}
-				}
-				if (!moreMismatches)
-					return new LetExpr(bindingInits, bodyExpr, isLoop);
-			} catch (e:Exception) {
-				Var.popThreadBindings();
-				throw(e);
+				i += 2;
 			}
-			Var.popThreadBindings();
+
+			var bodyExpr:Expr;
+
+			bodyExpr = (new BodyExpr.BodyExprParser()).parse(isLoop ? C.RETURN : context, body);
+			trace("=========================================LET EXPR parse end");
+			return new LetExpr(bindingInits, bodyExpr, isLoop);
 		}
 	}
 }
+
+// try {
+// } catch (e:Exception) {
+// 	Var.popThreadBindings();
+// 	throw e;
+// }
+// Var.popThreadBindings();

@@ -5,12 +5,16 @@ import lang.exceptions.IllegalArgumentException;
 import lang.misc.Thread;
 import haxe.ds.Vector;
 
-final class Var extends ARef implements IFn implements IRef implements Settable // , Serializable
-{
+final class Var extends ARef implements IFn implements IRef implements Settable { // imlements Serializable
+	// ======================================================================================================================
+	// Static
+	// ======================================================================================================================
 	static var dvals:Frame = Frame.TOP;
-
 	@:volatile static public var rev:Int = 0;
 
+	static var macroKey:Keyword = Keyword.create(null, "macro");
+	static var nameKey:Keyword = Keyword.create(null, "name");
+	static var nsKey:Keyword = Keyword.create(null, "ns");
 	static var privateKey:Keyword = Keyword.create(null, "private");
 	static var privateMeta:IPersistentMap = {
 		var v:Vector<Any> = new Vector<Any>(2);
@@ -18,38 +22,94 @@ final class Var extends ARef implements IFn implements IRef implements Settable 
 		v[1] = true;
 		PersistentArrayMap.createFromArray(v);
 	}
-	static var macroKey:Keyword = Keyword.create(null, "macro");
-	static var nameKey:Keyword = Keyword.create(null, "name");
-	static var nsKey:Keyword = Keyword.create(null, "ns");
 
-	@:volatile var root:Any;
+	static final assoc:IFn = new AssocFN();
+	static final dissoc:IFn = new DissocFN();
 
-	@:volatile var dyn:Bool = false;
-	@:transient var threadBound:Bool = false;
-
-	public var sym:Symbol;
-	public var ns:Namespace;
-
-	public static function getThreadBindingFrame():Any {
+	public static function getThreadBindingFrame():Frame {
 		return dvals;
 	}
 
-	public static function cloneThreadBindingFrame():Any {
+	public static function cloneThreadBindingFrame():Frame {
 		// return dvals.get().clone();
 		return dvals.clone();
 	}
 
-	public static function resetThreadBindingFrame(frame:Any) {
+	public static function resetThreadBindingFrame(frame:Frame) {
 		dvals = frame;
 	}
 
+	public static function find(nsQualifiedSym:Symbol):Var {
+		if (nsQualifiedSym.ns == null)
+			throw new IllegalArgumentException("Symbol must be namespace-qualified");
+		var ns:Namespace = Namespace.find(Symbol.internNSname(nsQualifiedSym.ns));
+		if (ns == null)
+			throw new IllegalArgumentException("No such namespace: " + nsQualifiedSym.ns);
+		return ns.findInternedVar(Symbol.internNSname(nsQualifiedSym.name));
+	}
+
+	public static function pushThreadBindings(bindings:Associative) {
+		var f:Frame = dvals;
+		var bmap:Associative = f.bindings;
+		var bs:ISeq = bindings.seq();
+		while (bs != null) {
+			var e:IMapEntry = cast(bs.first(), IMapEntry);
+			var v:Var = cast e.key();
+			if (!v.dynam)
+				throw new IllegalStateException("Can't dynamically bind non-dynamic var: " + v.ns + "/" + v.sym);
+			v.validate(v.getValidator(), e.val());
+			v.threadBound = true;
+			bmap = bmap.assoc(v, new TBox(Thread.currentThread(), e.val()));
+			bs = bs.next();
+		}
+		dvals = new Frame(bmap, f);
+	}
+
+	public static function popThreadBindings() {
+		var f:Frame = dvals.prev;
+		if (f == null) {
+			throw new IllegalStateException("Pop without matching push");
+		} else if (f == Frame.TOP) {
+			// TODO:
+			// dvals.remove();
+			dvals = f;
+		} else {
+			dvals = f; // .set(f);
+		}
+	}
+
+	public static function getThreadBindings():Associative {
+		var f:Frame = dvals; //  dvals.get();
+		var ret:IPersistentMap = PersistentHashMap.EMPTY;
+		var bs:ISeq = f.bindings.seq();
+		while (bs != null) {
+			var e:IMapEntry = bs.first();
+			var v:Var = e.key();
+			var b:TBox = e.val();
+			ret = cast ret.assoc(v, b.val);
+			bs = bs.next();
+		}
+		return ret;
+	}
+
+	// ======================================================================================================================
+	// Instance
+	// ======================================================================================================================
+	public var sym:Symbol;
+	public var ns:Namespace;
+
+	@:volatile var root:Any;
+
+	@:volatile var dynam:Bool = false;
+	@:transient var threadBound:Bool = false;
+
 	public function setDynamic(?b:Bool = true):Var {
-		this.dyn = b;
+		this.dynam = b;
 		return this;
 	}
 
 	public function isDynamic():Bool {
-		return dyn;
+		return dynam;
 	}
 
 	public static function intern3(ns:Namespace, sym:Symbol, root:Any):Var {
@@ -72,15 +132,6 @@ final class Var extends ARef implements IFn implements IRef implements Settable 
 		if (ns != null)
 			return "#'" + ns.name + "/" + sym;
 		return "#<Var: " + (sym != null ? sym.toString() : "--unnamed--") + ">";
-	}
-
-	public static function find(nsQualifiedSym:Symbol):Var {
-		if (nsQualifiedSym.ns == null)
-			throw new IllegalArgumentException("Symbol must be namespace-qualified");
-		var ns:Namespace = Namespace.find(Symbol.internNSname(nsQualifiedSym.ns));
-		if (ns == null)
-			throw new IllegalArgumentException("No such namespace: " + nsQualifiedSym.ns);
-		return ns.findInternedVar(Symbol.internNSname(nsQualifiedSym.name));
 	}
 
 	public static function internSym(nsName:Symbol, sym:Symbol):Var {
@@ -252,50 +303,6 @@ final class Var extends ARef implements IFn implements IRef implements Settable 
 		return newRoot;
 	}
 
-	public static function pushThreadBindings(bindings:Associative) {
-		var f:Frame = dvals;
-		var bmap:Associative = f.bindings;
-		var bs:ISeq = bindings.seq();
-		while (bs != null) {
-			var e:IMapEntry = cast(bs.first(), IMapEntry);
-			var v:Var = cast e.key();
-			if (!v.dyn)
-				throw new IllegalStateException("Can't dynamically bind non-dynamic var: " + v.ns + "/" + v.sym);
-			v.validate(v.getValidator(), e.val());
-			v.threadBound = true;
-			bmap = bmap.assoc(v, new TBox(Thread.currentThread(), e.val()));
-			bs = bs.next();
-		}
-		dvals = new Frame(bmap, f);
-	}
-
-	public static function popThreadBindings() {
-		var f:Frame = dvals.prev;
-		if (f == null) {
-			throw new IllegalStateException("Pop without matching push");
-		} else if (f == Frame.TOP) {
-			// TODO:
-			// dvals.remove();
-			dvals = f;
-		} else {
-			dvals = f; // .set(f);
-		}
-	}
-
-	public static function getThreadBindings():Associative {
-		var f:Frame = dvals; //  dvals.get();
-		var ret:IPersistentMap = PersistentHashMap.EMPTY;
-		var bs:ISeq = f.bindings.seq();
-		while (bs != null) {
-			var e:IMapEntry = bs.first();
-			var v:Var = e.key();
-			var b:TBox = e.val();
-			ret = cast ret.assoc(v, b.val);
-			bs = bs.next();
-		}
-		return ret;
-	}
-
 	public function getThreadBinding():TBox {
 		if (threadBound) {
 			var e:IMapEntry = dvals.bindings.entryAt(this);
@@ -308,9 +315,6 @@ final class Var extends ARef implements IFn implements IRef implements Settable 
 	public function fn():IFn {
 		return deref();
 	}
-
-	static final assoc:IFn = new AssocFN();
-	static final dissoc:IFn = new DissocFN();
 }
 
 class AssocFN extends AFn {

@@ -395,6 +395,7 @@ class Compiler {
 	}
 
 	public static function registerLocal(sym:Symbol, tag:Symbol, init:Expr, isArg:Bool):LocalBinding {
+		trace("register local: " + sym + " " + tag + " " + init + " " + isArg);
 		var num:Int = getAndIncLocalNum();
 		var b:LocalBinding = new LocalBinding(num, sym, tag, init, isArg, clearPathRoot());
 		var localsMap:IPersistentMap = LOCAL_ENV.deref();
@@ -420,6 +421,7 @@ class Compiler {
 	}
 
 	public static function analyze3(context:C, form:Any, name:String):Expr {
+		trace("Compiler/analyze: " + context + " " + form +  " " + name);
 		try {
 			if (U.instanceof(form, LazySeq)) {
 				var mform:Any = form;
@@ -802,13 +804,13 @@ class Compiler {
 	}
 
 	static public function lookupVar3(sym:Symbol, internNew:Bool, registerMacro:Bool):Var {
+		trace(">>>> lookupVar3: " + sym + " " + sym.ns);
 		var varr:Var = null;
 		// note - ns-qualified vars in other namespaces must already exist
 		if (sym.ns != null) {
 			var ns:Namespace = namespaceFor(sym);
 			if (ns == null)
 				return null;
-			// throw Util.runtimeException("No such namespace: " + sym.ns);
 			var name:Symbol = Symbol.intern1(sym.name);
 			if (internNew && ns == currentNS())
 				varr = currentNS().intern(name);

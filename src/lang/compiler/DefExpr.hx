@@ -31,17 +31,18 @@ class DefExpr implements Expr {
 		this.initProvided = initProvided;
 	}
 
-	private function includesExplicitMetadata(expr:MapExpr):Bool {
-		var i:Int = 0;
-		while (i < expr.keyvals.count()) {
-			var k:Keyword = cast(expr.keyvals.nth(i), KeywordExpr).k;
-			if ((k != RT.FILE_KEY) && (k != RT.DECLARED_KEY) && (k != RT.LINE_KEY) && (k != RT.COLUMN_KEY))
-				return true;
-			i += 2;
+	/*
+		private function includesExplicitMetadata(expr:MapExpr):Bool {
+			var i:Int = 0;
+			while (i < expr.keyvals.count()) {
+				var k:Keyword = cast(expr.keyvals.nth(i), KeywordExpr).k;
+				if ((k != RT.FILE_KEY) && (k != RT.DECLARED_KEY) && (k != RT.LINE_KEY) && (k != RT.COLUMN_KEY))
+					return true;
+				i += 2;
+			}
+			return false;
 		}
-		return false;
-	}
-
+	 */
 	public function eval():Any {
 		try {
 			if (initProvided) {
@@ -80,8 +81,10 @@ class DefExprParser implements IParser {
 			throw Util.runtimeException("Too few arguments to def");
 		else if (!U.instanceof(RT.second(form), Symbol))
 			throw Util.runtimeException("First argument to def must be a Symbol");
+
 		var sym:Symbol = RT.second(form);
 		var v:Var = Compiler.lookupVar(sym, true);
+		trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DefExprParser: " + sym + " " + v);
 		if (v == null)
 			throw Util.runtimeException("Can't refer to qualified var that doesn't exist");
 		if (!Compiler.currentNS().equals(v.ns)) {

@@ -6,13 +6,47 @@ import lang.exceptions.NullPointerException;
 
 // TODO: make concurent
 class Namespace extends AReference {
-	public var name:Symbol;
-
-	public var mappings:IPersistentMap;
-	public var aliases:IPersistentMap;
-
+	// ==========================================================================================================================
+	// Static global
+	// ==========================================================================================================================
 	// public static var namespaces:Map<Symbol, Namespace> = new Map<Symbol, Namespace>();
 	public static var namespaces:PersistentHashMap = PersistentHashMap.EMPTY;
+
+	public static function all():ISeq {
+		return RT.seq(namespaces.valIterator());
+	}
+
+	public static function findOrCreate(name:Symbol):Namespace {
+		var ns:Namespace = namespaces.get(name);
+		if (ns != null)
+			return ns;
+		var newns:Namespace = new Namespace(name);
+		// namespaces.set(name, newns);
+		namespaces = cast namespaces.assoc(name, newns);
+		return newns;
+	}
+
+	public static function remove(name:Symbol):Namespace {
+		if (name.equals(RT.CLOJURE_NS.name))
+			throw new IllegalArgumentException("Cannot remove clojure namespace");
+		var v:Namespace = namespaces.get(name);
+		// namespaces.remove(name);
+		namespaces = cast namespaces.without(name);
+		return v;
+	}
+
+	public static function find(name:Symbol):Namespace {
+		return namespaces.get(name);
+	}
+
+	// ==========================================================================================================================
+	// Instance fields
+	// ==========================================================================================================================
+	public var name:Symbol;
+
+	// Symbol -> Var/Class (Class from RT)
+	@:transient public var mappings:IPersistentMap;
+	@:transient public var aliases:IPersistentMap;
 
 	public function toString():String {
 		return name.toString();
@@ -22,15 +56,11 @@ class Namespace extends AReference {
 		return (U.instanceof(o, Namespace) && this.name.equals((o : Namespace).name));
 	}
 
-	public function new(name:Symbol) {
+	private function new(name:Symbol) {
 		super(name.meta());
 		this.name = name;
 		mappings = RT.DEFAULT_IMPORTS;
 		aliases = RT.map();
-	}
-
-	public static function all():ISeq {
-		return RT.seq(namespaces.valIterator());
 	}
 
 	public function getName():Symbol {
@@ -98,7 +128,7 @@ class Namespace extends AReference {
 	 */
 	private function checkReplacement(sym:Symbol, old:Any, neu:Any):Bool {
 		if (U.instanceof(old, Var)) {
-			var ons:Namespace = cast(old, Var).ns;
+			// var ons:Namespace = cast(old, Var).ns;
 			var nns:Namespace = U.instanceof(neu, Var) ? (neu : Var).ns : null;
 
 			if (isInternedMapping(sym, old)) {
@@ -120,7 +150,7 @@ class Namespace extends AReference {
 
 		var map:IPersistentMap = getMappings();
 		var o:Any;
-		if ((o = map.valAt(sym)) == null) {
+		while ((o = map.valAt(sym)) == null) {
 			var newMap:IPersistentMap = cast map.assoc(sym, val);
 			// mappings.compareAndSet(map, newMap);
 			mappings = newMap;
@@ -191,29 +221,6 @@ class Namespace extends AReference {
 		return cast reference(sym, v);
 	}
 
-	public static function findOrCreate(name:Symbol):Namespace {
-		var ns:Namespace = namespaces.get(name);
-		if (ns != null)
-			return ns;
-		var newns:Namespace = new Namespace(name);
-		// namespaces.set(name, newns);
-		namespaces = cast namespaces.assoc(name, newns);
-		return newns;
-	}
-
-	public static function remove(name:Symbol):Namespace {
-		if (name.equals(RT.CLOJURE_NS.name))
-			throw new IllegalArgumentException("Cannot remove clojure namespace");
-		var v:Namespace = namespaces.get(name);
-		// namespaces.remove(name);
-		namespaces = cast namespaces.without(name);
-		return v;
-	}
-
-	public static function find(name:Symbol):Namespace {
-		return namespaces.get(name);
-	}
-
 	public function getMapping(name:Symbol):Any {
 		return mappings.valAt(name);
 	}
@@ -259,9 +266,9 @@ class Namespace extends AReference {
 		}
 	}
 
-	private function readResolve():Any {
-		// ensures that serialized namespaces are "deserialized" to the
-		// namespace in the present runtime
-		return findOrCreate(name);
-	}
+	// private function readResolve():Any {
+	// 	// ensures that serialized namespaces are "deserialized" to the
+	// 	// namespace in the present runtime
+	// 	return findOrCreate(name);
+	// }
 }

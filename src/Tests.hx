@@ -24,8 +24,9 @@ class Tests {
 		RT.staticInit();
 
 		// utest.UTest.run([new test.CompilerTest()]);
-
+		// utest.UTest.run([new test.NamespaceTest()]);
 		// the long way
+
 		var runner = new Runner();
 		runner.addCases(test);
 		Report.create(runner);
