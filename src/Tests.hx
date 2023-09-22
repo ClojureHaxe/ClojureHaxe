@@ -17,7 +17,7 @@ private var init:Bool = {
 	// Namespace.namespaces;
 	PersistentList.EMPTY;
 	true;
-}
+};
 
 class Tests {
 	static function main() {

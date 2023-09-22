@@ -39,7 +39,7 @@ private var init:Bool = {
 	//PersistentHashMap.EMPTY;
 	//
 	true;
-}
+};
 
 
 class Main {
