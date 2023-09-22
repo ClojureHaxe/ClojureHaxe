@@ -53,7 +53,7 @@ final class Var extends ARef implements IFn implements IRef implements Settable 
 		var bmap:Associative = f.bindings;
 		var bs:ISeq = bindings.seq();
 		while (bs != null) {
-			var e:IMapEntry = cast(bs.first(), IMapEntry);
+			var e:IMapEntry = bs.first();
 			var v:Var = cast e.key();
 			if (!v.dynam)
 				throw new IllegalStateException("Can't dynamically bind non-dynamic var: " + v.ns + "/" + v.sym);

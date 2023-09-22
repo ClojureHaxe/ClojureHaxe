@@ -5,7 +5,7 @@ import haxe.Exception;
 class CompilerException extends Exception implements IExceptionInfo {
 	public var source:String;
 
-	public var line:Int;
+	public var _line:Int;
 
 	public var data:Any;
 
@@ -39,7 +39,7 @@ class CompilerException extends Exception implements IExceptionInfo {
 	public function new(source:String, line:Int, column:Int, sym:Symbol, phase:Keyword, cause:Exception) {
 		super(makeMsg(source, line, column, sym, phase, cause), cause);
 		this.source = source;
-		this.line = line;
+		this._line = line;
 		var m:Associative = RT.map(ERR_PHASE, phase, ERR_LINE, line, ERR_COLUMN, column);
 		if (source != null)
 			m = RT.assoc(m, ERR_SOURCE, source);

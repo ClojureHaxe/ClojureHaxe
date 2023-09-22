@@ -803,6 +803,7 @@ class Compiler {
 		throw Util.runtimeException("Unable to resolve symbol: " + sym + " in this context");
 	}
 
+	// Get or create Var
 	static public function lookupVar3(sym:Symbol, internNew:Bool, registerMacro:Bool):Var {
 		trace(">>>> lookupVar3: " + sym + " " + sym.ns);
 		var varr:Var = null;
@@ -844,6 +845,7 @@ class Compiler {
 
 	// 6881
 	public static function registerVar(varr:Var) {
+		trace(">>>>>>>>>>>> REGISTER VARS: " +  varr);
 		if (!VARS.isBound())
 			return;
 		var varsMap:IPersistentMap = VARS.deref();
@@ -851,7 +853,7 @@ class Compiler {
 		if (id == null) {
 			VARS.set(RT.assoc(varsMap, varr, registerConstant(varr)));
 		}
-		// trace(">>>>>>>>>>>> REGISTER VARS: " +  VARS);
+		
 	}
 
 	static public function currentNS():Namespace {
@@ -930,7 +932,7 @@ class Compiler {
 		} catch (e:LispReader.ReaderExceptionLR) {
 			Var.popThreadBindings();
 			if (U.instanceof(e, LispReader.ReaderExceptionLR))
-				throw new CompilerException(sourcePath, e.line, e.column, null, CompilerException.PHASE_READ, e.previous);
+				throw new CompilerException(sourcePath, e._line, e.column, null, CompilerException.PHASE_READ, e.previous);
 		} catch (e:Exception) {
 			Var.popThreadBindings();
 			if (!(U.instanceof(e, CompilerException)))
