@@ -9,6 +9,21 @@ Experimental Clojure port written in [Haxe](https://haxe.org/) targeting C++, Ha
 
 [HashLink](https://hashlink.haxe.org/) is a virtual machine for Haxe [oriented towards real time games](https://haxe.org/blog/shirogames-stack/).
 
+## Build and run
+Current version is tested with Haxe 4.3.2.
+Install Haxe and appropriate libs for platforms. E.g. to build executable with cpp:
+```
+haxelib install hxcpp
+```
+
+### Running tests
+
+```
+$ haxelib install utest 
+$ haxe test.hxml
+```
+
+
 ## Status
 Work in progress. Near all major classes from `clojure.lang.*` have been ported, ignoring all concurrent primitives and thread-safety (see 'Concurrent primitives' table at the bottom). On the way to work on Compiler and load/compile `clojure.core`.
 
