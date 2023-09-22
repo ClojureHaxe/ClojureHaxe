@@ -212,7 +212,7 @@ implements MapEquivalence implements IHashEq {
 }
 
 class MakeEntryFN extends AFn {
-	public function new() {};
+	public function new() {}
 
 	override public function invoke2(key:Any, val:Any):Any {
 		return MapEntry.create(key, val);
@@ -220,7 +220,7 @@ class MakeEntryFN extends AFn {
 }
 
 class MakeKeyFN extends AFn {
-	public function new() {};
+	public function new() {}
 
 	override public function invoke2(key:Any, val:Any):Any {
 		return return key;
@@ -228,7 +228,7 @@ class MakeKeyFN extends AFn {
 }
 
 class MakeValFN extends AFn {
-	public function new() {};
+	public function new() {}
 
 	override public function invoke2(key:Any, val:Any):Any {
 		return return val;

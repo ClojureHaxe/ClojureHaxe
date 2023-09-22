@@ -5,7 +5,7 @@ import sys.thread.Thread in Th;
 #end
 
 class Thread {
-	public function new() {};
+	public function new() {}
 
 	// Fake thread for platforms such as JS,
 	// always return same "Thread" object

@@ -531,7 +531,7 @@ class TransientVectorConjAFn extends AFn {
 }
 
 class NotFound {
-	public function new() {};
+	public function new() {}
 }
 
 // TransientVector ===========================================================================
