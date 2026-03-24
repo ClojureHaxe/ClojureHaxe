@@ -104,14 +104,11 @@ class CompilerTest extends Test {
         Assert.equals(15, readEval(code), "testStaticMethod");
     }
 
+    public function testDefExpr() {
+        Assert.equals(10, readEval("(def a 10) a"));
+    }
 
     /*
-	public function testDefExpr() {
-		trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> START testDefExpr  >>>>>>>>>>>>>>>>>>>>>>>>");
-		Assert.equals(10, readEval("(def a 10) a"));
-		trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END testDefExpr  >>>>>>>>>>>>>>>>>>>>>>>>");
-	}
-
 	public function testLet() {
 		trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> START testLet  >>>>>>>>>>>>>>>>>>>>>>>>");
 		trace(readEval(" (let* [a 10] a)  "));
